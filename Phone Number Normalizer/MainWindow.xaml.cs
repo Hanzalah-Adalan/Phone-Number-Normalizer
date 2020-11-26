@@ -16,7 +16,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using IronXL;
 using System.Text.RegularExpressions;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
@@ -38,6 +37,19 @@ namespace Phone_Number_Normalizer
         List<string> numbers = new List<string>();
         ExcelWorkbook workbook;
         ExcelWorksheet sheet;
+
+
+
+        public int NumberWithHyphenCount
+        {
+            get { return (int)GetValue(NumberWithHyphenCountProperty); }
+            set { SetValue(NumberWithHyphenCountProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for NumberWithHyphenCount.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty NumberWithHyphenCountProperty =
+            DependencyProperty.Register("NumberWithHyphenCount", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -73,11 +85,12 @@ namespace Phone_Number_Normalizer
                     }
 
                     if (chkBox_removeHyphen.IsChecked == true && Regex.IsMatch(_holder, @"\b.+-.+"))
-                    {
+                    {                        
                         _midHolder = Regex.Replace(_holder, @"-", "");
                     }
                     else
                     {
+                        NumberWithHyphenCount++;
                         _midHolder = _holder;
                     }
 

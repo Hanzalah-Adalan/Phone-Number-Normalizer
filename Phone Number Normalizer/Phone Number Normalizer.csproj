@@ -5,11 +5,11 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <RootNamespace>Phone_Number_Normalizer</RootNamespace>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>sabella square.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="5.4.2" />
-    <PackageReference Include="IronXL.Excel" Version="2020.9.1" />
     <PackageReference Include="MaterialDesignThemes" Version="3.2.0" />
   </ItemGroup>
 

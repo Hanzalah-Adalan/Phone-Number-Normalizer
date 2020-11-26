@@ -5,96 +5,129 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Phone_Number_Normalizer"
         mc:Ignorable="d"
-        Title="Sabella Phone Number Normalizer" Height="450" Width="800"
+        Title="Sabella Phone Number Normalizer" Height="700" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
-        FontFamily="{materialDesign:MaterialDesignFont}"
-        xmlns:ironXL="clr-namespace:IronXL;assembly=IronXL">
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-        </Grid.RowDefinitions>
+        FontFamily="{materialDesign:MaterialDesignFont}">
 
-        <Grid MaxHeight="200">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-                <ColumnDefinition Width="1*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+    <TabControl>
+        <TabItem Header="Phone Normalizer">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                </Grid.RowDefinitions>
 
-            <StackPanel Margin="10">
-                <TextBlock x:Name="txtBlock_filename" 
+
+
+                <Grid MaxHeight="200">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Margin="10">
+                        <TextBlock x:Name="txtBlock_filename" 
                            d:Text="The selected file.xls"></TextBlock>
-                <Button x:Name="btn_loadFile" 
+                        <Button x:Name="btn_loadFile" 
                         Margin="0,8,0,0"
                         ToolTip="Open an Excel file to process"
                         Click="btn_loadFile_Click">Load file</Button>
-            </StackPanel>
+                    </StackPanel>
 
-            <StackPanel Grid.Column="1"
+                    <StackPanel Grid.Column="1"
                         Margin="10">
-                <Label>Select sheet</Label>
-                <ComboBox x:Name="cmbBox_sheetSelector"
+                        <Label>Select sheet</Label>
+                        <ComboBox x:Name="cmbBox_sheetSelector"
                           IsEnabled="{Binding IsSheetSelectorEnabled}"
                           SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
                           DisplayMemberPath="Name">
-                </ComboBox>
-            </StackPanel>
-            
-            <StackPanel Grid.Column="2"
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
                         Margin="10">
-                <Label>Select column</Label>
-                <ComboBox x:Name="cmbBox_columnSelector" 
+                        <Label>Select column</Label>
+                        <ComboBox x:Name="cmbBox_columnSelector" 
                           IsEnabled="{Binding IsColumnSelectorEnabled}"
                           DisplayMemberPath="Name"
                           SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
-            </StackPanel>
-            
-        </Grid>
-        
-        <StackPanel Grid.Row="1">
-            <Button x:Name="btnTestSingleBtn"
+                    </StackPanel>
+
+                </Grid>
+
+                <StackPanel Grid.Row="1"
+                    Margin="10,0">
+                    <Button x:Name="btnTestSingleBtn"
                     Click="btnTestSingleBtn_Click">Test single number</Button>
-            <TextBox x:Name="txtBox"></TextBox>
-        </StackPanel>
-        
-        <StackPanel Orientation="Horizontal"
+                    <TextBox x:Name="txtBox"></TextBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
                     Grid.Row="2"
-                    Margin="20">
-            <CheckBox x:Name="chkBox_removeHyphen">Remove Hyphen</CheckBox>
-            <CheckBox x:Name="chkBox_removeWhiteSpace">Remove Whitespace</CheckBox>
-            <CheckBox x:Name="chkBox_removeCountryCodes">Remove Country code (Malaysia)</CheckBox>
-            <CheckBox x:Name="chkBox_otherCountries">Other countries</CheckBox>
-            <CheckBox x:Name="chkBox_detectMultiNumbers" ToolTip="Detect customer with more than one numbers">Detect Multiple Numbers</CheckBox>
-            <CheckBox x:Name="chkBox_containsAlphabet" ToolTip="Detect if non digit character present in the cell value">Contains alphabet</CheckBox>
-            <CheckBox x:Name="chkBox_landline" ToolTip="Detect landline number">Landline</CheckBox>
-        </StackPanel>
-        
-        <Button Click="Button_Click"
+                    Margin="20"
+                    IsEnabled="{Binding IsManipulationButtonsEnabled}">
+
+                    <StackPanel>
+                        <CheckBox x:Name="chkBox_removeHyphen"
+                      IsChecked="True">Remove Hyphen</CheckBox>
+
+                        <CheckBox x:Name="chkBox_removeWhiteSpace"
+                      IsChecked="True">Remove Whitespace</CheckBox>
+
+                        <CheckBox x:Name="chkBox_removeCountryCodes"
+                      IsChecked="True">Remove Country code (Malaysia)</CheckBox>
+                    </StackPanel>
+
+                    <StackPanel Margin="10,0">
+                        <CheckBox x:Name="chkBox_otherCountries"
+                      IsChecked="True">Other countries</CheckBox>
+
+                        <CheckBox x:Name="chkBox_detectMultiNumbers" 
+                      ToolTip="Detect customer with more than one numbers"
+                      IsChecked="True">Detect Multiple Numbers</CheckBox>
+
+                        <CheckBox x:Name="chkBox_containsAlphabet" 
+                      ToolTip="Detect if non digit character present in the cell value"
+                      IsChecked="True">Contains alphabet</CheckBox>
+                    </StackPanel>
+
+                    <CheckBox x:Name="chkBox_landline" 
+                      ToolTip="Detect landline number"
+                      IsChecked="True">Landline</CheckBox>
+                </StackPanel>
+
+                <Button Click="Button_Click"
                 IsEnabled="{Binding IsManipulationButtonsEnabled}"
                 Grid.Row="3"
                 ToolTip="Load an Excel file to process">Import and Normalize Phone Numbers</Button>
-        
-        <ListBox x:Name="listbox"
+
+                <ListBox x:Name="listbox"
                  Grid.Row="4" 
                  Padding="20"></ListBox>
 
-        <StatusBar x:Name="statusBar"
+                <StatusBar x:Name="statusBar"
                    Grid.Row="5">
-            <StatusBarItem>17600 customers</StatusBarItem>
-            <Separator/>
-            <StatusBarItem>67 users with multiple contacts found</StatusBarItem>
-            <Separator/>
-            <StatusBarItem>3 errors found</StatusBarItem>
-        </StatusBar>
-    </Grid>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithHyphenCount}"/><Run Text=" hyphen(s) found"/></TextBlock>
+                    </StatusBarItem>
+                    <Separator/>
+                    <StatusBarItem>67 users with multiple contacts found</StatusBarItem>
+                    <Separator/>
+                    <StatusBarItem>3 errors found</StatusBarItem>
+                </StatusBar>
+            </Grid>
+        </TabItem>
+        <TabItem Header="Promo price calculator"></TabItem>
+    </TabControl>
+    
+   
 </Window>
