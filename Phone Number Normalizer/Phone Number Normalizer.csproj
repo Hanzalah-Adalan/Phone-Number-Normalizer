@@ -6,6 +6,7 @@
     <RootNamespace>Phone_Number_Normalizer</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>sabella square.ico</ApplicationIcon>
+    <Configurations>Debug;Release;x86</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
