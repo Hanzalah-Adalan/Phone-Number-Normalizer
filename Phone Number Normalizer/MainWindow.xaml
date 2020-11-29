@@ -14,6 +14,11 @@
         FontFamily="{materialDesign:MaterialDesignFont}">
 
     <TabControl>
+        <TabItem Header="Upline finder">
+            <Button x:Name="btn_findUpline"
+                    Click="btn_findUpline_Click"></Button>
+        </TabItem>
+        
         <TabItem Header="Phone Normalizer">
             <Grid>
                 <Grid.RowDefinitions>

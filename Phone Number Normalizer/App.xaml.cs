@@ -13,5 +13,6 @@ namespace Phone_Number_Normalizer
     /// </summary>
     public partial class App : Application
     {
+
     }
 }
