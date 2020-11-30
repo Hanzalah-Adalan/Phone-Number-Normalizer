@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 using OfficeOpenXml;
 using OfficeOpenXml.Table;
+using System.Net.Http;
 using System.Diagnostics;
 
 namespace Phone_Number_Normalizer
@@ -28,11 +29,34 @@ namespace Phone_Number_Normalizer
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-
+        private LowLevelKeyboardListener _listener;
         public MainWindow()
         {
             InitializeComponent();
             DataContext = this;
+
+            _listener = new LowLevelKeyboardListener();
+            _listener.OnKeyPressed += _listener_OnKeyPressed;
+
+            _listener.HookKeyboard();
+        }
+
+        void _listener_OnKeyPressed(object sender, KeyPressedArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) && Keyboard.IsKeyDown(Key.LeftShift) && e.KeyPressed == Key.W)
+            {
+                if (this.WindowState == WindowState.Minimized)
+                    this.WindowState = WindowState.Normal;
+
+                this.Activate();
+
+                btn_findUpline.Content += "This is what we talkin about";
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            _listener.UnHookKeyboard();
         }
 
         List<string> numbers = new List<string>();
@@ -331,6 +355,16 @@ namespace Phone_Number_Normalizer
         public static readonly DependencyProperty IsManipulationButtonsEnabledProperty =
             DependencyProperty.Register("IsManipulationButtonsEnabled", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
+        private async void btn_findUpline_Click(object sender, RoutedEventArgs e)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                using (var request = new HttpRequestMessage(new HttpMethod("GET"), "https://www.sabella.com.my/"))
+                {
+                    var response = await httpClient.SendAsync(request);
+                }
+            }
+        }
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
 
