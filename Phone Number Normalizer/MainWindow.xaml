@@ -5,23 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Phone_Number_Normalizer"
         mc:Ignorable="d"
-        Title="Sabella Phone Number Normalizer" Height="700" Width="800"
+        Title="Sabella Toolkit" Height="700" Width="800"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
-        FontFamily="{materialDesign:MaterialDesignFont}"
+        FontFamily="{materialDesign:MaterialDesignFont}"        
+    xmlns:model="clr-namespace:MaterialDesignExtensions.Model;assembly=MaterialDesignExtensions"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
 
-    <TabControl>
-        <TabItem Header="Upline finder">
-            <Button x:Name="btn_findUpline"
-                    Click="btn_findUpline_Click"></Button>
+    <TabControl Style="{StaticResource MaterialDesignTabControl}">
+            <TabItem Header="Order tracker">
+            <StackPanel Margin="20">
+
+                <ProgressBar Visibility="{Binding IsFetchingUpline}"
+                             IsIndeterminate="True"
+                             Margin="0,0,0,12"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+
+                    <StackPanel Orientation="Horizontal">
+                        <Label>Order ID:</Label>
+
+                        <TextBox x:Name="customerID"
+                             IsEnabled="{Binding IsFindUplineEnabled}"
+                             Margin="10,0,0,0"
+                             MinWidth="200"/>
+                    </StackPanel>
+
+                    <Button x:Name="btn_findUpline"
+                            Click="btn_findUpline_Click"
+                            Margin="20,0"
+                            IsEnabled="{Binding IsFindUplineEnabled}"
+                            Grid.Column="1">
+                        <StackPanel>
+                            <TextBlock>Find upline</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button x:Name="btn_openOrderDetailsPage" 
+                            Grid.Column="2"
+                            ToolTip="See order details on the web"
+                            Click="btn_openOrderDetailsPage_Click">Open details page</Button>
+                </Grid>
+
+                <StackPanel>
+                    <TextBox x:Name="txtBox_endCustName"/>
+                    <TextBox x:Name="txtBox_endCustPay"/>
+                    <TextBox x:Name="txtBox_endCustDate"/>
+                    <TextBox x:Name="txtBox_endCustStatus"/>
+                </StackPanel>
+                
+                <mde:Stepper x:Name="stepper" 
+                             IsLinear="False" 
+                             Layout="Vertical"
+                             Margin="20">
+                 
+                    <!--<model:Step>
+                        <model:Step.Header>
+                            <model:StepTitleHeader FirstLevelTitle="Premier Partner" 
+                                                   SecondLevelTitle="Header and content" />
+                        </model:Step.Header>
+                        <model:Step.Content>
+                            <Hyperlink>Ma email</Hyperlink>
+                        </model:Step.Content>
+                    </model:Step>-->
+                    
+                </mde:Stepper>
+            </StackPanel>
         </TabItem>
         
-    <TabControl Style="{StaticResource MaterialDesignTabControl}">
-        <TabItem Header="Phone Normalizer">
+            <TabItem Header="Contact normalizer">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -171,8 +232,8 @@
                 </StatusBar>
             </Grid>
         </TabItem>
-        <TabItem Header="Promo price calculator"></TabItem>
-        <TabItem Header="Nabila converter">
+        
+        <TabItem Header="Whatsapp opener">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -182,13 +243,15 @@
                 <CheckBox Margin="20" 
                           HorizontalAlignment="Center"
                           VerticalAlignment="Bottom"
-                          x:Name="chkBox_useNativeWhatsapp">Use whatsapp web instead</CheckBox>
+                          x:Name="chkBox_useNativeWhatsapp">Use native Whatsapp instead</CheckBox>
                 
                 <Button Margin="20"
                         Grid.Row="1"
                     Click="Button_Click_2">Clean and open number in whatsapp</Button>
             </Grid>
         </TabItem>
+
+        <TabItem Header="Promo price calculator"></TabItem>
     </TabControl>
     
    
