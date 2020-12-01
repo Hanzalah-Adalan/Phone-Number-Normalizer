@@ -11,226 +11,95 @@
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
-        FontFamily="{materialDesign:MaterialDesignFont}"        
-    xmlns:model="clr-namespace:MaterialDesignExtensions.Model;assembly=MaterialDesignExtensions"
+        FontFamily="{materialDesign:MaterialDesignFont}"            
+        xmlns:model="clr-namespace:MaterialDesignExtensions.Model;assembly=MaterialDesignExtensions"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
 
     <TabControl Style="{StaticResource MaterialDesignTabControl}">
             <TabItem Header="Order tracker">
-            <StackPanel Margin="20">
 
-                <ProgressBar Visibility="{Binding IsFetchingUpline}"
+            <ScrollViewer>
+                <StackPanel Margin="20">
+
+                    <ProgressBar Visibility="{Binding IsFetchingUpline}"
                              IsIndeterminate="True"
                              Margin="0,0,0,12"/>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
 
+                        <StackPanel Orientation="Horizontal">
+                            <Label>Order ID:</Label>
 
-                    <StackPanel Orientation="Horizontal">
-                        <Label>Order ID:</Label>
-
-                        <TextBox x:Name="customerID"
+                            <TextBox x:Name="customerID"
                              IsEnabled="{Binding IsFindUplineEnabled}"
                              Margin="10,0,0,0"
                              MinWidth="200"/>
-                    </StackPanel>
+                        </StackPanel>
 
-                    <Button x:Name="btn_findUpline"
+                        <Button x:Name="btn_findUpline"
                             Click="btn_findUpline_Click"
                             Margin="20,0"
                             IsEnabled="{Binding IsFindUplineEnabled}"
                             Grid.Column="1">
-                        <StackPanel>
-                            <TextBlock>Find upline</TextBlock>
-                        </StackPanel>
-                    </Button>
-                    
-                    <Button x:Name="btn_openOrderDetailsPage" 
+                            <StackPanel>
+                                <TextBlock>Find upline</TextBlock>
+                            </StackPanel>
+                        </Button>
+
+                        <Button x:Name="btn_openOrderDetailsPage" 
                             Grid.Column="2"
                             ToolTip="See order details on the web"
                             Click="btn_openOrderDetailsPage_Click">Open details page</Button>
-                </Grid>
-
-                <StackPanel>
-                    <TextBox x:Name="txtBox_endCustName"/>
-                    <TextBox x:Name="txtBox_endCustPay"/>
-                    <TextBox x:Name="txtBox_endCustDate"/>
-                    <TextBox x:Name="txtBox_endCustStatus"/>
-                </StackPanel>
-                
-                <mde:Stepper x:Name="stepper" 
-                             IsLinear="False" 
-                             Layout="Vertical"
-                             Margin="20">
-                 
-                    <!--<model:Step>
-                        <model:Step.Header>
-                            <model:StepTitleHeader FirstLevelTitle="Premier Partner" 
-                                                   SecondLevelTitle="Header and content" />
-                        </model:Step.Header>
-                        <model:Step.Content>
-                            <Hyperlink>Ma email</Hyperlink>
-                        </model:Step.Content>
-                    </model:Step>-->
-                    
-                </mde:Stepper>
-            </StackPanel>
-        </TabItem>
-        
-            <TabItem Header="Contact normalizer">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
-                </Grid.RowDefinitions>
-
-
-                
-
-                <Grid MaxHeight="200"
-                      Margin="20,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Margin="0,10">
-                        <Label x:Name="txtBlock_filename" 
-                               Content="Please select a file"
-                               d:Content="The selected file.xls"/>
-                        
-                        <Button x:Name="btn_loadFile" 
-                                Margin="0,8,0,0"
-                                ToolTip="Open an Excel file to process"
-                                Click="btn_loadFile_Click">Load file</Button>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1"
-                        Margin="10">
-                        <Label>Select sheet</Label>
-                        <ComboBox x:Name="cmbBox_sheetSelector"
-                          IsEnabled="{Binding IsSheetSelectorEnabled}"
-                          SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
-                          DisplayMemberPath="Name">
-                        </ComboBox>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="2"
-                        Margin="0,10">
-                        <Label>Select column</Label>
-                        <ComboBox x:Name="cmbBox_columnSelector" 
-                          IsEnabled="{Binding IsColumnSelectorEnabled}"
-                          DisplayMemberPath="Name"
-                          SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
-                    </StackPanel>
-
-                </Grid>
-
-                <StackPanel Orientation="Horizontal"
-                    Grid.Row="1"
-                    Margin="20"
-                    IsEnabled="{Binding IsManipulationButtonsEnabled}">
+                    </Grid>
 
                     <StackPanel>
-                        <CheckBox x:Name="chkBox_removeHyphen"
-                      IsChecked="True">Remove Hyphen</CheckBox>
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBox">
+                                <Setter Property="IsReadOnly" Value="True"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Style>
+                        </StackPanel.Resources>
 
-                        <CheckBox x:Name="chkBox_removeWhiteSpace"
-                      IsChecked="True">Remove Whitespace</CheckBox>
+                        <Label Margin="0,32,0,10">End customer (delivery) details:</Label>
 
-                        <CheckBox x:Name="chkBox_removeCountryCodes"
-                      IsChecked="True">Remove Country code (Malaysia)</CheckBox>
+                        <TextBox x:Name="txtBox_endCustName"/>
+                        <TextBox x:Name="txtBox_endCustPay"/>
+                        <TextBox x:Name="txtBox_endCustDate"/>
+                        <TextBox x:Name="txtBox_endCustStatus"/>
                     </StackPanel>
 
-                    <StackPanel Margin="10,0">
-                        <CheckBox x:Name="chkBox_otherCountries"
-                      IsChecked="True">Other countries</CheckBox>
+                    <mde:Stepper x:Name="stepper" 
+                             IsLinear="False" 
+                             Layout="Vertical"
+                             Margin="20"/>
 
-                        <CheckBox x:Name="chkBox_detectMultiNumbers" 
-                      ToolTip="Detect customer with more than one numbers"
-                      IsChecked="True">Detect Multiple Numbers</CheckBox>
+                    <Button x:Name="btn_DHLTracking"
+                            Click="btn_DHLTracking_Click">Track DHL</Button>
+                    <Expander Header="Register browser">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
 
-                        <CheckBox x:Name="chkBox_containsAlphabet" 
-                      ToolTip="Detect if non digit character present in the cell value"
-                      IsChecked="True">Contains alphabet</CheckBox>
-                    </StackPanel>
+                            <Button x:Name="btn_register_cookie" 
+                                Click="btn_register_cookie_Click">Register browser cookie</Button>
 
-                    <CheckBox x:Name="chkBox_landline" 
-                      ToolTip="Detect landline number"
-                      IsChecked="True">Landline</CheckBox>
+                            <TextBox x:Name="txtBox_cookie"
+                                 Margin="20,0,0,0"
+                                 Grid.Column="1"/>
+                        </Grid>
+                    </Expander>
+
                 </StackPanel>
-
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    
-                    <Button Click="Button_Click"
-                            Margin="20,0,10,0"
-                            IsEnabled="{Binding IsManipulationButtonsEnabled}">Analyze and load original</Button>
-
-                    <Button Grid.Column="1"
-                            IsEnabled="{Binding IsManipulationButtonsEnabled}">Clean and load</Button>
-                    
-                    <Button Margin="10,0,20,0"
-                            Grid.Column="2"
-                            IsEnabled="{Binding IsExportButtonEnabled}">Export data</Button>
-                </Grid>
-
-                <ListBox x:Name="listbox"
-                 Grid.Row="3" 
-                 Padding="20"></ListBox>
-
-                <StatusBar x:Name="statusBar"
-                           Grid.Row="4">
-                    <StatusBarItem>
-                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithHyphenCount}"/><Run Text=" hyphen(s)"/></TextBlock>
-                    </StatusBarItem>
-                    
-                    <Separator/>
-                    <StatusBarItem>
-                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithWhitespaceCount}"/><Run Text=" whitespace(s)"/></TextBlock>
-                    </StatusBarItem>
-                    
-                    <Separator/>
-                    <StatusBarItem>
-                        <TextBlock xml:space="preserve" 
-                                   ToolTip="Malaysia country code"><Run Text="{Binding NumberWithWhitespaceCount}"/><Run Text=" country code(s)"/></TextBlock>
-                    </StatusBarItem>
-
-                        <Separator/>
-                        <StatusBarItem>
-                            <TextBlock xml:space="preserve"><Run Text="{Binding OtherCountryCodeCounter}"/><Run Text=" other country code(s)"/></TextBlock>
-                        </StatusBarItem>
-
-                    <Button Click="Button_Click_1"></Button>
-                    <Separator/>
-                    <StatusBarItem>
-                        <TextBlock xml:space="preserve"><Run Text="{Binding MultipleNumberCounter}"/><Run Text=" multiple numbers"/></TextBlock>
-                    </StatusBarItem>
-
-                    <Separator/>
-                    <StatusBarItem>
-                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithAlphabetCounter}"/><Run Text=" contains alphabet(s)"/></TextBlock>
-                    </StatusBarItem>
-
-                    <Separator/>
-                    <StatusBarItem>
-                        <TextBlock xml:space="preserve"><Run Text="{Binding LandlineCounter}"/><Run Text=" landline(s)"/></TextBlock>
-                    </StatusBarItem>
-                </StatusBar>
-            </Grid>
+            </ScrollViewer>
+                
         </TabItem>
         
         <TabItem Header="Whatsapp opener">
