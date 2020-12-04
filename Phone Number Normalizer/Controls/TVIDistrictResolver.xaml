@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="Phone_Number_Normalizer.Controls.TVIDistrictResolver"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Phone_Number_Normalizer.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+
+        <ListView x:Name="listview" 
+                  ItemsSource="{Binding Places}"
+                  SelectionMode="Multiple"
+                  SelectionChanged="ListView_SelectionChanged">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock><Run Text="{Binding District}"/> (<Run Text="{Binding DuplicateCount}" Foreground="Crimson"/> cells)</TextBlock>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <StackPanel Grid.Column="1"
+                    Margin="20,0"
+                    VerticalAlignment="Center">
+
+            <ComboBox x:Name="cmbBox_potentialCandidates" 
+                      IsEditable="True"
+                      SelectionChanged="ComboBox_SelectionChanged"
+                      DisplayMemberPath="District" 
+                      IsTextSearchEnabled="False"
+                      TextBoxBase.TextChanged="cmbBox_potentialCandidates_TextChanged">
+            </ComboBox>
+            
+            <Button x:Name="btn_resolve" 
+                    Margin="0,12,0,0"
+                    Click="btn_resolve_Click">Resolve as</Button>
+        </StackPanel>
+    </Grid>
+</UserControl>

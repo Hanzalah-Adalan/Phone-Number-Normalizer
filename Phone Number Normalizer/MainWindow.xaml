@@ -11,12 +11,425 @@
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
+        xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+        xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
         FontFamily="{materialDesign:MaterialDesignFont}"            
         xmlns:model="clr-namespace:MaterialDesignExtensions.Model;assembly=MaterialDesignExtensions"
         xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
 
+    <Window.Resources>
+        <Style x:Key="MaterialDesignTreeViewItem" TargetType="{x:Type TreeViewItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Padding" Value="8" />
+            <Setter Property="FocusVisualStyle" Value="{StaticResource MaterialDesignTreeViewItemFocusVisual}"/>
+            <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType={x:Type TreeView}}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TreeViewItem}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            
+                            <VisualStateManager.VisualStateGroups>
+                                
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualStateGroup.Transitions>
+                                        <VisualTransition GeneratedDuration="0:0:0.3" To="Normal">
+                                            <VisualTransition.GeneratedEasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </VisualTransition.GeneratedEasingFunction>
+                                        </VisualTransition>
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState Name="Normal"/>
+                                    
+                                    <VisualState Name="MouseOver">
+                                        <Storyboard>
+                                            <!--<DoubleAnimation Storyboard.TargetName="MouseOverBorder" Storyboard.TargetProperty="Opacity"
+                                                             To="0.1" Duration="0"/>
+                                            <DoubleAnimation Storyboard.TargetName="MouseOverBorder" Storyboard.TargetProperty="Opacity"
+                                                             To="0.1" Duration="0"/>-->
+                                        </Storyboard>
+                                    </VisualState>
+                                    
+                                    <VisualState Name="Disabled"/>
+                                </VisualStateGroup>
+                                
+                                <VisualStateGroup x:Name="SelectionStates">
+                                    <VisualStateGroup.Transitions>
+                                        <VisualTransition GeneratedDuration="0:0:0.6"/>
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState Name="Selected">
+                                        <Storyboard>
+                                            <!--<DoubleAnimation Storyboard.TargetName="SelectedBorder"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.18" Duration="0"/>-->
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState Name="Unselected"/>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="ExpansionStates">
+                                    <VisualStateGroup.Transitions>
+                                        <VisualTransition GeneratedDuration="0" To="Expanded">
+                                            <VisualTransition.GeneratedEasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </VisualTransition.GeneratedEasingFunction>
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Visibility">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <!--<DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="ItemsHost" To="1" Duration="0:0:0.3"/>-->
+                                                <DoubleAnimation Storyboard.TargetProperty="Scale" Storyboard.TargetName="ScaleHost" To="1" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </VisualTransition>
+                                        <VisualTransition GeneratedDuration="0" To="Collapsed">
+                                            <VisualTransition.GeneratedEasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </VisualTransition.GeneratedEasingFunction>
+                                            <Storyboard>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Visibility">
+                                                    <DiscreteObjectKeyFrame KeyTime="0:0:0.3" Value="{x:Static Visibility.Collapsed}" />
+                                                </ObjectAnimationUsingKeyFrames>
+                                                <!--<DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="ItemsHost" To="0" Duration="0:0:0.3"/>-->
+                                                <DoubleAnimation Storyboard.TargetProperty="Scale" Storyboard.TargetName="ScaleHost" To="0" Duration="0:0:0.3"/>
+                                            </Storyboard>
+                                        </VisualTransition>
+                                    </VisualStateGroup.Transitions>
+                                    <VisualState x:Name="Expanded">
+                                        <Storyboard>
+                                            <!--<DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="ItemsHost" To="1" Duration="0"/>-->
+                                            <DoubleAnimation Storyboard.TargetProperty="Scale" Storyboard.TargetName="ScaleHost" To="1" Duration="0:0:0.3"/>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Collapsed">
+                                        <Storyboard>
+                                            <!--<DoubleAnimation Storyboard.TargetProperty="Opacity" Storyboard.TargetName="ItemsHost" To="0" Duration="0"/>-->
+                                            <DoubleAnimation Storyboard.TargetProperty="Scale" Storyboard.TargetName="ScaleHost" To="0" Duration="0:0:0.3"/>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetName="ItemsHost" Storyboard.TargetProperty="Visibility">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Collapsed}" />
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            
+                            <materialDesign:ScaleHost x:Name="ScaleHost" />
+                            
+                            <ToggleButton x:Name="Expander" ClickMode="Press" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}}" 
+                                      Style="{StaticResource MaterialDesignExpandCollapseToggleStyle}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      Margin="8 0 8 0"
+                                      VerticalAlignment="Center"
+                                              />
+
+                            <Border x:Name="MouseOverBorder"
+                                Grid.Column="1" Grid.ColumnSpan="2"
+                                IsHitTestVisible="False"
+                                Opacity="0"
+                                Background="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"/>
+
+                            <Border x:Name="SelectedBorder"
+                                Grid.Column="1" Grid.ColumnSpan="2"
+                                IsHitTestVisible="False"
+                                Opacity="0"
+                                Background="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"/>
+
+                            <Grid Grid.Column="1" Grid.ColumnSpan="2" x:Name="ContentGrid" Background="{TemplateBinding Background}">
+                                <ContentPresenter x:Name="PART_Header" ContentSource="Header"/>
+                                <!--<materialDesign:Ripple Feedback="{TemplateBinding Foreground, Converter={StaticResource BrushRoundConverter}}"
+                                        Focusable="False"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter x:Name="PART_Header" ContentSource="Header"/>
+                                </materialDesign:Ripple>-->
+                            </Grid>
+
+                            <ContentControl Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                        x:Name="AdditionalContentControl"
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:TreeViewAssist.AdditionalTemplate)}"
+                                        ContentTemplateSelector="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:TreeViewAssist.AdditionalTemplateSelector)}"                                        
+                                        Visibility="Collapsed">
+                            </ContentControl>
+
+                            <StackPanel Grid.Column="1" Grid.Row="2"
+                                    x:Name="ItemsPanel"
+                                    Margin="-16 0 0 0"
+                                    Grid.ColumnSpan="2">
+                                <StackPanel.Height>
+                                    <MultiBinding Converter="{StaticResource MathMlpMultipleConverter}">
+                                        <Binding ElementName="ItemsHost" Path="ActualHeight"/>
+                                        <Binding ElementName="ScaleHost" Path="Scale"/>
+                                    </MultiBinding>
+                                </StackPanel.Height>
+                                <ItemsPresenter x:Name="ItemsHost"
+                                            VerticalAlignment="Top"
+                                            Opacity="0"
+                                            Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:TreeViewAssist.AdditionalTemplate), Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}" 
+                                     Value="Visible">
+                                <Setter TargetName="AdditionalContentControl" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=(materialDesign:TreeViewAssist.AdditionalTemplateSelector), Converter={StaticResource NullableToVisibilityConverter}, Mode=OneWay}" 
+                                     Value="Visible">
+                                <Setter TargetName="AdditionalContentControl" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter Property="Visibility" TargetName="Expander" Value="Hidden"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <!--<Setter Property="Opacity" Value=".56"/>-->
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="VirtualizingPanel.IsVirtualizing" Value="true">
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+        
     <TabControl Style="{StaticResource MaterialDesignTabControl}">
-            <TabItem Header="Order tracker">
+
+        <TabItem Header="Contact normalizer">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                </Grid.RowDefinitions>
+
+
+                <Expander x:Name="expander_mainExcelCleaner" 
+                          Header="Hide Initials Control elements"
+                          IsExpanded="True"
+                          Expanded="expander_mainExcelCleaner_Expanded"
+                          Collapsed="expander_mainExcelCleaner_Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <Grid MaxHeight="200"
+                      Margin="20,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                                <ColumnDefinition Width="1*"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Margin="0,10">
+                                <Label x:Name="txtBlock_filename" 
+                               Content="Please select a file"
+                               d:Content="The selected file.xls"/>
+
+                                <Button x:Name="btn_loadFile" 
+                                Margin="0,8,0,0"
+                                ToolTip="Open an Excel file to process"
+                                Click="btn_loadFile_Click">Load file</Button>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                        Margin="10">
+                                <Label>Select sheet</Label>
+                                <ComboBox x:Name="cmbBox_sheetSelector"
+                          IsEnabled="{Binding IsSheetSelectorEnabled}"
+                          SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
+                          DisplayMemberPath="Name">
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2"
+                        Margin="0,10">
+                                <Label>Select column</Label>
+                                <ComboBox x:Name="cmbBox_columnSelector" 
+                          IsEnabled="{Binding IsColumnSelectorEnabled}"
+                          DisplayMemberPath="Name"
+                          SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
+                            </StackPanel>
+
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal"
+                    Grid.Row="1"
+                    Margin="20"
+                    IsEnabled="{Binding IsManipulationButtonsEnabled}">
+
+                            <StackPanel>
+                                <CheckBox x:Name="chkBox_removeHyphen"
+                      IsChecked="True">Remove Hyphen</CheckBox>
+
+                                <CheckBox x:Name="chkBox_removeWhiteSpace"
+                      IsChecked="True">Remove Whitespace</CheckBox>
+
+                                <CheckBox x:Name="chkBox_removeCountryCodes"
+                      IsChecked="True">Remove Country code (Malaysia)</CheckBox>
+                            </StackPanel>
+
+                            <StackPanel Margin="10,0">
+                                <CheckBox x:Name="chkBox_otherCountries"
+                      IsChecked="True">Other countries</CheckBox>
+
+                                <CheckBox x:Name="chkBox_detectMultiNumbers" 
+                      ToolTip="Detect customer with more than one numbers"
+                      IsChecked="True">Detect Multiple Numbers</CheckBox>
+
+                                <CheckBox x:Name="chkBox_containsAlphabet" 
+                      ToolTip="Detect if non digit character present in the cell value"
+                      IsChecked="True">Contains alphabet</CheckBox>
+                            </StackPanel>
+
+                            <CheckBox x:Name="chkBox_landline" 
+                      ToolTip="Detect landline number"
+                      IsChecked="True">Landline</CheckBox>
+                        </StackPanel>
+
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Click="Button_Click"
+                            Margin="20,0,10,0"
+                            IsEnabled="{Binding IsManipulationButtonsEnabled}">Analyze and clean data</Button>
+
+                            <Button x:Name="btn_standardizeRegionName" 
+                            Grid.Column="1"
+                            IsEnabled="{Binding IsManipulationButtonsEnabled}"
+                            Click="btn_standardizeRegionName_Click">Standardize region name</Button>
+
+                            <Button Margin="10,0,20,0"
+                            Grid.Column="2"
+                            IsEnabled="{Binding IsExportButtonEnabled}">Export data</Button>
+                        </Grid>
+                    </Grid>
+                </Expander>
+                
+                <ListView x:Name="listbox"
+                          Grid.Row="1" 
+                          Padding="20"
+                          Margin="20,20,0,0">
+
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}" 
+                                               Text="{Binding Name}"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                    
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding District}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListView>
+
+                <ScrollViewer Grid.Row="1"
+                              PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                    
+                    <TreeView x:Name="treeview_regionNameFixer"
+                              SelectedItemChanged="treeview_regionNameFixer_SelectedItemChanged">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="True" />
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                    </TreeView>
+                </ScrollViewer>
+
+                <StatusBar x:Name="statusBar"
+                           Grid.Row="2">
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithHyphenCount}"/><Run Text=" hyphen(s)"/></TextBlock>
+                    </StatusBarItem>
+
+                    <Separator/>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithWhitespaceCount}"/><Run Text=" whitespace(s)"/></TextBlock>
+                    </StatusBarItem>
+
+                    <Separator/>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve" 
+                                   ToolTip="Malaysia country code"><Run Text="{Binding NumberWithWhitespaceCount}"/><Run Text=" country code(s)"/></TextBlock>
+                    </StatusBarItem>
+
+                    <Separator/>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding OtherCountryCodeCounter}"/><Run Text=" other country code(s)"/></TextBlock>
+                    </StatusBarItem>
+
+                    <Button Click="Button_Click_1"></Button>
+                    <Separator/>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding MultipleNumberCounter}"/><Run Text=" multiple numbers"/></TextBlock>
+                    </StatusBarItem>
+
+                    <Separator/>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithAlphabetCounter}"/><Run Text=" contains alphabet(s)"/></TextBlock>
+                    </StatusBarItem>
+
+                    <Separator/>
+                    <StatusBarItem>
+                        <TextBlock xml:space="preserve"><Run Text="{Binding LandlineCounter}"/><Run Text=" landline(s)"/></TextBlock>
+                    </StatusBarItem>
+                </StatusBar>
+            </Grid>
+        </TabItem>
+
+
+        <TabItem Header="Scan IT">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                
+                <Button x:Name="btn_openSheet"
+                        Click="btn_openSheet_Click">Open sheets</Button>
+                
+                <ListView x:Name="listView_scanIT" 
+                          Grid.Row="1"></ListView>
+            </Grid>
+        </TabItem>
+        
+        <TabItem Header="Order tracker">
 
             <ScrollViewer>
                 <StackPanel Margin="20">
@@ -79,8 +492,146 @@
                              Layout="Vertical"
                              Margin="20"/>
 
-                    <Button x:Name="btn_DHLTracking"
-                            Click="btn_DHLTracking_Click">Track DHL</Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Label>DHL Tracking ID:</Label>
+                        
+                        <TextBox x:Name="txtBox_DHLTrackingID"
+                                 MinWidth="200"
+                                 Margin="20,0"/>
+                        
+                        <Button x:Name="btn_trackDHLShipment"
+                                Click="btn_trackDHLShipment_Click">Track DHL shipment</Button>
+                    </StackPanel>
+                    <Grid Margin="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition></RowDefinition>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock x:Name="txtBlock_trackingID" 
+                                   d:Text="MYCMG871627361823"
+                                   Text="{Binding DHLTrackingID}"
+                                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
+
+                        <StackPanel Grid.Row="1"
+                                    Grid.ColumnSpan="2">
+                            <TextBlock d:Text="Enroute to facility"
+                                       Text="{Binding LastUpdateStatusCode}"
+                                       Foreground="Green"
+                                       FontWeight="SemiBold"
+                                       Style="{StaticResource MaterialDesignBody1TextBlock}"></TextBlock>
+                            
+                            <Label d:Content="Tue, 01 December at 05:54 PM LT"
+                                   Content="{Binding LastUpdateDate}"/>
+                            <Label d:Content="MY"
+                                   Content="{Binding LastUpdateLocation}"/>
+
+                            <Label d:Content="ProductName:"
+                                   Content="{Binding ProductName}"/>
+
+                            <Label d:Content="Reference Number:"
+                                   Content="{Binding ReferenceNumber}"/>
+
+                            <Label d:Content="Reference Number:"
+                                   Content="{Binding ReferenceType}"/>
+
+                            <Label d:Content="Service:"
+                                   Content="{Binding DHLService}"/>
+                        </StackPanel>
+
+                        <!--Shipment details-->
+                        <Grid Grid.Row="2"
+                              Grid.ColumnSpan="2"
+                              Margin="0,20,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Label Content="From:"></Label>
+                                <TextBox AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Grid.Column="1" 
+                                         Text="{Binding OriginAddress}"/>
+
+
+                            </Grid>
+
+                            <Grid Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Label Content="To:"></Label>
+                                <TextBox AcceptsReturn="True"
+                                         TextWrapping="Wrap"
+                                         Grid.Column="1" 
+                                         Text="{Binding DestinationAddress}"/>
+
+                                
+                            </Grid>
+                        </Grid>
+
+
+                        <mde:Stepper Grid.Row="3"
+                                     Grid.ColumnSpan="2"
+                                     x:Name="stepper_tracking" 
+                                     IsLinear="False" 
+                                     Layout="Vertical"
+                                     Margin="20">
+                            
+                            <!--<model:Step>
+                                <model:Step.Header>
+                                    <model:StepTitleHeader FirstLevelTitle="Enroute to facility"
+                                                           SecondLevelTitle="MY"/>
+                                </model:Step.Header>
+                                <model:Step.Content>
+                                    <Label>some body content</Label>
+                                </model:Step.Content>
+                            </model:Step>
+
+                            <model:Step>
+                                <model:Step.Header>
+                                    <model:StepTitleHeader FirstLevelTitle="Shipment data received"
+                                                           SecondLevelTitle="MY"/>
+                                </model:Step.Header>
+                                <model:Step.Content>
+                                    <Label>some body content</Label>
+                                </model:Step.Content>
+                            </model:Step>
+
+                            <model:Step>
+                                <model:Step.Header>
+                                    <model:StepTitleHeader FirstLevelTitle="DATA SUBMITTED"
+                                                           SecondLevelTitle="Kuala Lumpur, MY"/>
+                                </model:Step.Header>
+                                <model:Step.Content>
+                                    <Label>some body content</Label>
+                                </model:Step.Content>
+                            </model:Step>-->
+
+
+                        </mde:Stepper>
+
+
+                    </Grid>
+                    
+                    
+                   
                     <Expander Header="Register browser">
                         <Grid>
                             <Grid.ColumnDefinitions>
