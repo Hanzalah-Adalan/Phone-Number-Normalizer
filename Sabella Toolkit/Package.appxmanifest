@@ -9,7 +9,7 @@
   <Identity
     Name="SabellaToolkit"
     Publisher="CN=FD627B2F-9EAF-46D2-8F1D-217754E48DDF"
-    Version="1.0.8.0" />
+    Version="1.2.10.0" />
 
   <Properties>
     <DisplayName>Sabella Toolkit</DisplayName>

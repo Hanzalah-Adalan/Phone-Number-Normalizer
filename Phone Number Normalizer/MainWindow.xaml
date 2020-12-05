@@ -15,7 +15,8 @@
         xmlns:dat="clr-namespace:System.Windows.Data;assembly=PresentationFramework"
         FontFamily="{materialDesign:MaterialDesignFont}"            
         xmlns:model="clr-namespace:MaterialDesignExtensions.Model;assembly=MaterialDesignExtensions"
-        xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions">
+        xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+        Topmost="False">
 
     <Window.Resources>
         <Style x:Key="MaterialDesignTreeViewItem" TargetType="{x:Type TreeViewItem}">
@@ -218,7 +219,8 @@
         
     <TabControl Style="{StaticResource MaterialDesignTabControl}">
 
-        <TabItem Header="Contact normalizer">
+        <TabItem Header="Excel cleaner">
+          
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -227,115 +229,204 @@
                 </Grid.RowDefinitions>
 
 
-                <Expander x:Name="expander_mainExcelCleaner" 
-                          Header="Hide Initials Control elements"
-                          IsExpanded="True"
-                          Expanded="expander_mainExcelCleaner_Expanded"
-                          Collapsed="expander_mainExcelCleaner_Collapsed">
-                    <Grid>
+                <Expander IsExpanded="True">
+                    <Expander.Header>
+                        <Border Background="Black" 
+                                CornerRadius="4"
+                                Padding="8">
+                            <TextBlock Foreground="WhiteSmoke" 
+                                       Style="{StaticResource MaterialDesignHeadline6TextBlock}">Main controls</TextBlock>
+                        </Border>
+                    </Expander.Header>
+                    
+                    <Grid Margin="40,0,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"></RowDefinition>
                             <RowDefinition Height="auto"></RowDefinition>
                             <RowDefinition Height="auto"></RowDefinition>
                         </Grid.RowDefinitions>
 
-                        <Grid MaxHeight="200"
-                      Margin="20,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*"></ColumnDefinition>
-                                <ColumnDefinition Width="1*"></ColumnDefinition>
-                                <ColumnDefinition Width="1*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
+                        <Expander x:Name="expander_mainExcelCleaner" 
+                          IsExpanded="True">
+                            <Expander.Header>
+                                <Border Background="Black" 
+                                CornerRadius="4"
+                                Padding="8">
+                                    <TextBlock Foreground="WhiteSmoke" 
+                                       Style="{StaticResource MaterialDesignHeadline6TextBlock}">File Loader</TextBlock>
+                                </Border>
+                            </Expander.Header>
 
-                            <StackPanel Margin="0,10">
-                                <Label x:Name="txtBlock_filename" 
-                               Content="Please select a file"
+                            <Grid Margin="60,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                    <RowDefinition Height="auto"></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <Grid MaxHeight="200"
+                      Margin="20,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Margin="0,10">
+                                        <Label x:Name="txtBlock_filename" 
+                               Content="Select an excel file"
                                d:Content="The selected file.xls"/>
 
-                                <Button x:Name="btn_loadFile" 
+                                        <Button x:Name="btn_loadFile" 
                                 Margin="0,8,0,0"
                                 ToolTip="Open an Excel file to process"
                                 Click="btn_loadFile_Click">Load file</Button>
-                            </StackPanel>
+                                    </StackPanel>
 
-                            <StackPanel Grid.Column="1"
-                        Margin="10">
-                                <Label>Select sheet</Label>
-                                <ComboBox x:Name="cmbBox_sheetSelector"
-                          IsEnabled="{Binding IsSheetSelectorEnabled}"
-                          SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
-                          DisplayMemberPath="Name">
-                                </ComboBox>
-                            </StackPanel>
+                                    <StackPanel Grid.Column="1"
+                                        Margin="10">
+                                        <Label>Select sheet</Label>
+                                        <ComboBox x:Name="cmbBox_sheetSelector"
+                                          IsEnabled="{Binding IsSheetSelectorEnabled}"
+                                          SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
+                                          DisplayMemberPath="Name">
+                                        </ComboBox>
+                                    </StackPanel>
 
-                            <StackPanel Grid.Column="2"
+                                    <StackPanel Grid.Column="2"
                         Margin="0,10">
-                                <Label>Select column</Label>
-                                <ComboBox x:Name="cmbBox_columnSelector" 
+                                        <Label>Select column</Label>
+                                        <ComboBox x:Name="cmbBox_columnSelector" 
                           IsEnabled="{Binding IsColumnSelectorEnabled}"
                           DisplayMemberPath="Name"
                           SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
-                            </StackPanel>
+                                    </StackPanel>
 
-                        </Grid>
+                                </Grid>
 
-                        <StackPanel Orientation="Horizontal"
-                    Grid.Row="1"
+
+                            </Grid>
+                        </Expander>
+
+                        <Expander Grid.Row="1">
+                            <Expander.Header>
+                                <Border Background="Black" 
+                                CornerRadius="4"
+                                Padding="8">
+                                    <TextBlock Foreground="WhiteSmoke" 
+                                       Style="{StaticResource MaterialDesignHeadline6TextBlock}">Phone number option</TextBlock>
+                                </Border>
+                            </Expander.Header>
+
+                            <Grid Margin="60,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Orientation="Horizontal"
                     Margin="20"
                     IsEnabled="{Binding IsManipulationButtonsEnabled}">
 
-                            <StackPanel>
-                                <CheckBox x:Name="chkBox_removeHyphen"
+                                    <StackPanel>
+                                        <CheckBox x:Name="chkBox_removeHyphen"
                       IsChecked="True">Remove Hyphen</CheckBox>
 
-                                <CheckBox x:Name="chkBox_removeWhiteSpace"
+                                        <CheckBox x:Name="chkBox_removeWhiteSpace"
                       IsChecked="True">Remove Whitespace</CheckBox>
 
-                                <CheckBox x:Name="chkBox_removeCountryCodes"
+                                        <CheckBox x:Name="chkBox_removeCountryCodes"
                       IsChecked="True">Remove Country code (Malaysia)</CheckBox>
-                            </StackPanel>
+                                    </StackPanel>
 
-                            <StackPanel Margin="10,0">
-                                <CheckBox x:Name="chkBox_otherCountries"
+                                    <StackPanel Margin="10,0">
+                                        <CheckBox x:Name="chkBox_otherCountries"
                       IsChecked="True">Other countries</CheckBox>
 
-                                <CheckBox x:Name="chkBox_detectMultiNumbers" 
+                                        <CheckBox x:Name="chkBox_detectMultiNumbers" 
                       ToolTip="Detect customer with more than one numbers"
                       IsChecked="True">Detect Multiple Numbers</CheckBox>
 
-                                <CheckBox x:Name="chkBox_containsAlphabet" 
+                                        <CheckBox x:Name="chkBox_containsAlphabet" 
                       ToolTip="Detect if non digit character present in the cell value"
                       IsChecked="True">Contains alphabet</CheckBox>
-                            </StackPanel>
+                                    </StackPanel>
 
-                            <CheckBox x:Name="chkBox_landline" 
+                                    <CheckBox x:Name="chkBox_landline" 
                       ToolTip="Detect landline number"
                       IsChecked="True">Landline</CheckBox>
-                        </StackPanel>
+                                </StackPanel>
 
-                        <Grid Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
 
-                            <Button Click="Button_Click"
+                                    <Button Click="Button_Click"
                             Margin="20,0,10,0"
                             IsEnabled="{Binding IsManipulationButtonsEnabled}">Analyze and clean data</Button>
 
-                            <Button x:Name="btn_standardizeRegionName" 
-                            Grid.Column="1"
-                            IsEnabled="{Binding IsManipulationButtonsEnabled}"
-                            Click="btn_standardizeRegionName_Click">Standardize region name</Button>
 
-                            <Button Margin="10,0,20,0"
+                                    <Button Margin="10,0,20,0"
                             Grid.Column="2"
                             IsEnabled="{Binding IsExportButtonEnabled}">Export data</Button>
-                        </Grid>
+                                </Grid>
+                            </Grid>
+                        </Expander>
+
+                        <Expander Grid.Row="2">
+                            <Expander.Header>
+                                <Border Background="Black" 
+                                CornerRadius="4"
+                                Padding="8">
+                                    <TextBlock Foreground="WhiteSmoke" 
+                                       Style="{StaticResource MaterialDesignHeadline6TextBlock}">District name option</TextBlock>
+                                </Border>
+                            </Expander.Header>
+
+                            <Grid Margin="60,0,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Margin="20,0,0,0"
+                                VerticalAlignment="Top">Load simple</Button>
+
+                                <StackPanel Margin="20,0"
+                                            Grid.Column="1">
+                                    
+                                    <CheckBox x:Name="chkBox_excludeGroupWithSingleItem">Exclude groups with single item</CheckBox>
+                                    
+                                    <Button x:Name="btn_standardizeRegionName" 
+                                            Margin="0,10,0,0"
+                                            IsEnabled="{Binding IsManipulationButtonsEnabled}"
+                                            Click="btn_standardizeRegionName_Click"
+                                            VerticalAlignment="Top">Load grouped</Button>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2">
+                                    <RadioButton Tag="L"
+                                         Checked="rb_casing">Lower Case</RadioButton>
+                                    <RadioButton Tag="U"
+                                         Checked="rb_casing">Upper Case</RadioButton>
+                                    <RadioButton Tag="T" 
+                                         Checked="rb_casing"
+                                         ToolTip="Pascal Case. Capitalize Each Word">Title Case</RadioButton>
+
+                                    <Button Margin="0,12,40,0"
+                                    Click="btn_changeCase_clicked">Change case</Button>
+                                </StackPanel>
+
+
+                            </Grid>
+                        </Expander>
                     </Grid>
                 </Expander>
-                
+
                 <ListView x:Name="listbox"
                           Grid.Row="1" 
                           Padding="20"
@@ -374,39 +465,46 @@
 
                 <StatusBar x:Name="statusBar"
                            Grid.Row="2">
-                    <StatusBarItem>
+
+                    <StatusBarItem Visibility="{Binding RegionNameStatusBarItemVisibility}">
+                        <Label x:Name="txtBlock_selectedCells" 
+                               Content="{Binding CellSelectedInRegionColumn}" 
+                               Margin="10,0,0,0"/>
+                    </StatusBarItem>
+
+                    <Separator Visibility="{Binding RegionNameStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithHyphenCount}"/><Run Text=" hyphen(s)"/></TextBlock>
                     </StatusBarItem>
 
-                    <Separator/>
-                    <StatusBarItem>
+                    <Separator Visibility="{Binding PhoneNumberStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithWhitespaceCount}"/><Run Text=" whitespace(s)"/></TextBlock>
                     </StatusBarItem>
 
-                    <Separator/>
-                    <StatusBarItem>
+                    <Separator Visibility="{Binding PhoneNumberStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve" 
                                    ToolTip="Malaysia country code"><Run Text="{Binding NumberWithWhitespaceCount}"/><Run Text=" country code(s)"/></TextBlock>
                     </StatusBarItem>
 
-                    <Separator/>
-                    <StatusBarItem>
+                    <Separator Visibility="{Binding PhoneNumberStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve"><Run Text="{Binding OtherCountryCodeCounter}"/><Run Text=" other country code(s)"/></TextBlock>
                     </StatusBarItem>
 
-                    <Button Click="Button_Click_1"></Button>
-                    <Separator/>
-                    <StatusBarItem>
+                    <Separator Visibility="{Binding PhoneNumberStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve"><Run Text="{Binding MultipleNumberCounter}"/><Run Text=" multiple numbers"/></TextBlock>
                     </StatusBarItem>
 
-                    <Separator/>
-                    <StatusBarItem>
+                    <Separator Visibility="{Binding PhoneNumberStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve"><Run Text="{Binding NumberWithAlphabetCounter}"/><Run Text=" contains alphabet(s)"/></TextBlock>
                     </StatusBarItem>
 
-                    <Separator/>
-                    <StatusBarItem>
+                    <Separator Visibility="{Binding PhoneNumberStatusBarItemVisibility}"/>
+                    <StatusBarItem Visibility="{Binding PhoneNumberStatusBarItemVisibility}">
                         <TextBlock xml:space="preserve"><Run Text="{Binding LandlineCounter}"/><Run Text=" landline(s)"/></TextBlock>
                     </StatusBarItem>
                 </StatusBar>

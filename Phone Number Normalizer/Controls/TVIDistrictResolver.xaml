@@ -18,7 +18,7 @@
                   SelectionChanged="ListView_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock><Run Text="{Binding District}"/> (<Run Text="{Binding DuplicateCount}" Foreground="Crimson"/> cells)</TextBlock>
+                    <TextBlock><Run Text="{Binding District}"/> - <Run Text="{Binding DuplicateCount}" Foreground="Crimson"/> cell(s)</TextBlock>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
@@ -37,7 +37,8 @@
             
             <Button x:Name="btn_resolve" 
                     Margin="0,12,0,0"
-                    Click="btn_resolve_Click">Resolve as</Button>
+                    Click="btn_resolve_Click"
+                    IsEnabled="False">Resolve as</Button>
         </StackPanel>
     </Grid>
 </UserControl>

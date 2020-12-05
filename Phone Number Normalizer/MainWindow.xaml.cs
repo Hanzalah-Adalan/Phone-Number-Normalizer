@@ -35,6 +35,8 @@ using Google.Apis.Sheets.v4.Data;
 using System.Diagnostics.CodeAnalysis;
 using Phone_Number_Normalizer.Models;
 using Phone_Number_Normalizer.Controls;
+using System.Globalization;
+using OfficeOpenXml.Style;
 
 namespace Phone_Number_Normalizer
 {
@@ -58,8 +60,8 @@ namespace Phone_Number_Normalizer
 
         #region Contacts normalizer
         List<string> numbers = new List<string>();
-        ExcelWorkbook workbook;
-        ExcelWorksheet sheet;
+        //ExcelWorkbook workbook;
+        //ExcelWorksheet sheet;
 
 
 
@@ -148,83 +150,104 @@ namespace Phone_Number_Normalizer
         public static readonly DependencyProperty LandlineCounterProperty =
             DependencyProperty.Register("LandlineCounter", typeof(int), typeof(MainWindow), new PropertyMetadata(0));
 
-
-
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        enum ExcelManipulationMode
         {
-            numbers.Clear();
-            listbox.ItemsSource = null;
+            PhoneNumber,
+            RegionName
+        }
 
-            try
+        void SwitchStatusBarItemsVisibility(ExcelManipulationMode mode)
+        {
+            switch (mode)
             {
-                var _columnLetterPosition = GetColumnName(dataColumn.Position);
+                case ExcelManipulationMode.PhoneNumber:
+                    PhoneNumberStatusBarItemVisibility = Visibility.Visible;
+                    RegionNameStatusBarItemVisibility = Visibility.Collapsed;
+                    break;
 
-                var _address = $"{_columnLetterPosition}:{_columnLetterPosition}";
-
-                var _cellRange = sheet.Cells[_address];
-
-                //System.Diagnostics.Debug.WriteLine($"Total row count: {_phoneNumberColumn.Count()}");
-
-                foreach (var cell in _cellRange)
-                {
-                    //string _holder = "";
-                    //string _midHolder = "";
-
-                    var _sourceString = cell.Value.ToString();
-
-                    if (Regex.IsMatch(_sourceString, @"\s+"))
-                    {
-                        NumberWithWhitespaceCount++;
-
-                        if (chkBox_removeWhiteSpace.IsChecked == true)
-                            _sourceString = Regex.Replace(_sourceString, @"\s+", "");
-                    }
-
-                    if (Regex.IsMatch(_sourceString, @"@/&"))
-                    {
-                        MultipleNumberCounter++;
-                    }
-
-                    if (Regex.IsMatch(_sourceString, @""))
-                    {
-
-                    }
-
-                    if (_sourceString.StartsWith("(+60)"))
-                    {
-                        CountryCodeCounter++;
-                        _sourceString = _sourceString.Replace("(+60)", "0");
-                    }
-                    else if (_sourceString.StartsWith("+60"))
-                    {
-                        CountryCodeCounter++;
-                        _sourceString = _sourceString.Replace("+60", "0");
-                    }
-
-                    if (Regex.IsMatch(_sourceString, @"\b.+-.+"))
-                    {
-                        NumberWithHyphenCount++;
-                        if (chkBox_removeHyphen.IsChecked == true)
-                        {
-                            _sourceString = Regex.Replace(_sourceString, @"-", "");
-                        }
-                    }
-
-                    numbers.Add(_sourceString);
-                }
-
-                listbox.ItemsSource = numbers;
-                IsExportButtonEnabled = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
+                case ExcelManipulationMode.RegionName:
+                    PhoneNumberStatusBarItemVisibility = Visibility.Collapsed;
+                    RegionNameStatusBarItemVisibility = Visibility.Visible;
+                    break;
             }
         }
 
 
-        ExcelPackage package;
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            SwitchStatusBarItemsVisibility(ExcelManipulationMode.PhoneNumber);
+            numbers.Clear();
+            listbox.ItemsSource = null;
+
+            //try
+            //{
+            //    var _columnLetterPosition = GetColumnName(dataColumn.Position);
+
+            //    var _address = $"{_columnLetterPosition}:{_columnLetterPosition}";
+
+            //    var _cellRange = sheet.Cells[_address];
+
+            //    //System.Diagnostics.Debug.WriteLine($"Total row count: {_phoneNumberColumn.Count()}");
+
+            //    foreach (var cell in _cellRange)
+            //    {
+            //        //string _holder = "";
+            //        //string _midHolder = "";
+
+            //        var _sourceString = cell.Value.ToString();
+
+            //        if (Regex.IsMatch(_sourceString, @"\s+"))
+            //        {
+            //            NumberWithWhitespaceCount++;
+
+            //            if (chkBox_removeWhiteSpace.IsChecked == true)
+            //                _sourceString = Regex.Replace(_sourceString, @"\s+", "");
+            //        }
+
+            //        if (Regex.IsMatch(_sourceString, @"@/&"))
+            //        {
+            //            MultipleNumberCounter++;
+            //        }
+
+            //        if (Regex.IsMatch(_sourceString, @""))
+            //        {
+
+            //        }
+
+            //        if (_sourceString.StartsWith("(+60)"))
+            //        {
+            //            CountryCodeCounter++;
+            //            _sourceString = _sourceString.Replace("(+60)", "0");
+            //        }
+            //        else if (_sourceString.StartsWith("+60"))
+            //        {
+            //            CountryCodeCounter++;
+            //            _sourceString = _sourceString.Replace("+60", "0");
+            //        }
+
+            //        if (Regex.IsMatch(_sourceString, @"\b.+-.+"))
+            //        {
+            //            NumberWithHyphenCount++;
+            //            if (chkBox_removeHyphen.IsChecked == true)
+            //            {
+            //                _sourceString = Regex.Replace(_sourceString, @"-", "");
+            //            }
+            //        }
+
+            //        numbers.Add(_sourceString);
+            //    }
+
+            //    listbox.ItemsSource = numbers;
+            //    IsExportButtonEnabled = true;
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
+        }
+
+
+        //ExcelPackage package;
 
         private async void btn_loadFile_Click(object sender, RoutedEventArgs e)
         {
@@ -235,46 +258,56 @@ namespace Phone_Number_Normalizer
 
             if (openfileDialog1.ShowDialog() == true)
             {
-                FileInfo file = new FileInfo(openfileDialog1.FileName);
+                excelFilePath = openfileDialog1.FileName;
+                //FileInfo file = new FileInfo(openfileDialog1.FileName);
 
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-                package = new ExcelPackage();
 
-                await package.LoadAsync(file);
-                workbook = package.Workbook;
+                using var _pp = new ExcelPackage(new FileInfo(openfileDialog1.FileName));
 
                 txtBlock_filename.Content = openfileDialog1.SafeFileName;
 
                 cmbBox_sheetSelector.Items.Clear();
-                foreach (var item in package.Workbook.Worksheets)
+                foreach (var item in _pp.Workbook.Worksheets)
                 {
                     cmbBox_sheetSelector.Items.Add(item);
                 }
+
+                //package = new ExcelPackage();
+
+                //await package.LoadAsync(file);
+
             }
 
             IsSheetSelectorEnabled = !string.IsNullOrEmpty(openfileDialog1.FileName);
 
         }
 
+        public int WorksheetIndex { get; set; }
         private void cmbBox_sheetSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (cmbBox_sheetSelector.SelectedItem is ExcelWorksheet _ws)
             {
                 cmbBox_columnSelector.Items.Clear();
-                sheet = _ws;
+                WorksheetIndex = _ws.Index;
 
-                if (_ws.Tables.Count > 0)
+                using var _pp = new ExcelPackage(new FileInfo(excelFilePath));
+                var _newlyQueriedTables = _pp.Workbook.Worksheets[_ws.Index].Tables;
+
+                if (_newlyQueriedTables.Count > 0)
                 {
-                    var _columns = _ws.Tables.FirstOrDefault().Columns;
+                    var _columns = _newlyQueriedTables.FirstOrDefault().Columns;
                     foreach (var item in _columns)
                     {
                         cmbBox_columnSelector.Items.Add(item);
                     }
                     IsColumnSelectorEnabled = true;
+                    IsManipulationButtonsEnabled = true;
                 }
                 else
                 {
                     IsColumnSelectorEnabled = false;
+                    IsManipulationButtonsEnabled = false;
                     MessageBox.Show("No table(s) detected in this sheet. please create a table by pressing Ctrl + T to proceed");
                 }
             }
@@ -1158,29 +1191,74 @@ namespace Phone_Number_Normalizer
             }
         }
 
+
+
+        public Visibility PhoneNumberStatusBarItemVisibility
+        {
+            get { return (Visibility)GetValue(PhoneNumberStatusBarItemVisibilityProperty); }
+            set { SetValue(PhoneNumberStatusBarItemVisibilityProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for PhoneNumberStatusBarItemVisibility.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty PhoneNumberStatusBarItemVisibilityProperty =
+            DependencyProperty.Register("PhoneNumberStatusBarItemVisibility", typeof(Visibility), typeof(MainWindow), new PropertyMetadata(Visibility.Collapsed));
+
+
+
+        public Visibility RegionNameStatusBarItemVisibility
+        {
+            get { return (Visibility)GetValue(RegionNameStatusBarItemVisibilityProperty); }
+            set { SetValue(RegionNameStatusBarItemVisibilityProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for RegionNameStatusBarItemVisibility.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty RegionNameStatusBarItemVisibilityProperty =
+            DependencyProperty.Register("RegionNameStatusBarItemVisibility", typeof(Visibility), typeof(MainWindow), new PropertyMetadata(Visibility.Collapsed));
+
+
+
+        public string CellSelectedInRegionColumn
+        {
+            get { return (string)GetValue(CellSelectedInRegionColumnProperty); }
+            set { SetValue(CellSelectedInRegionColumnProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for CellSelectedInRegionColumn.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty CellSelectedInRegionColumnProperty =
+            DependencyProperty.Register("CellSelectedInRegionColumn", typeof(string), typeof(MainWindow), new PropertyMetadata(string.Empty));
+
+        class CellOBJ
+        {
+            public object Key { get; set; }
+            public IGrouping<object, ExcelRangeBase> Items { get; set; }
+        }
         private void btn_standardizeRegionName_Click(object sender, RoutedEventArgs e)
         {
+            SwitchStatusBarItemsVisibility(ExcelManipulationMode.RegionName);
             listbox.ItemsSource = null;
+            treeview_regionNameFixer.Items.Clear();
             var _thePlaces = new List<Place>();
 
+
+            using var _pp = new ExcelPackage(new FileInfo(excelFilePath));
             try
             {
                 var _columnLetterPosition = GetColumnName(dataColumn.Position);
 
                 var _address = $"{_columnLetterPosition}:{_columnLetterPosition}";
 
-                var _cellRange = sheet.Cells[_address];
+                var _cellRange = _pp.Workbook.Worksheets[WorksheetIndex].Cells[_address];
 
-
+                int _excludeParentWithSingleChild = (chkBox_excludeGroupWithSingleItem.IsChecked == true) ? 1 : 0;
 
                 var _groupedByValue = _cellRange.GroupBy(x => x.Value)
-                                      .Where(g => g.Count() > 0)
-                                      .Select(y => new { Key = y.Key, Items = y });
+                                      .Where(g => g.Count() > _excludeParentWithSingleChild)
+                                      .Select(y => new CellOBJ { Key = y.Key, Items = y });
 
-
+                TextInfo info = CultureInfo.CurrentCulture.TextInfo;
                 foreach (var _grup in _groupedByValue)
                 {
-                    var _disName = _grup.Key.ToString().Trim().ToUpper();
+                    var _disName = info.ToTitleCase(_grup.Key.ToString().Trim());
 
                     var _parentPlace = new Place
                     {
@@ -1188,7 +1266,7 @@ namespace Phone_Number_Normalizer
                         State = "Johor",
                         DuplicateCount = _grup.Items.Count(),
                     };
-                    
+
 
                     if (_parentPlace.District.Length == 3)
                     {
@@ -1214,46 +1292,57 @@ namespace Phone_Number_Normalizer
                             Address = _it.Address
                         };
 
-                        _parentPlace.Children.Add(_childPlace);                       
+                        _parentPlace.Children.Add(_childPlace);
                     }
 
                     _thePlaces.Add(_parentPlace);
                 }
 
-                var _groupedData = _thePlaces.GroupBy(p => p.GroupKey).OrderBy(g => g.Key).Where(q => q.Count() > 1);
+                var _groupedData = _thePlaces.GroupBy(p => p.GroupKey).OrderBy(g => g.Key).Where(q => q.Count() > 0);
 
                 var _childStyle = this.Resources["MaterialDesignTreeViewItem"] as Style;
 
                 foreach (var gd in _groupedData)
                 {
-                    var innerTVI = new TVIDistrictResolver(gd.Key.ToString());
-                    innerTVI.DeleteListViewRequested += (s, e) =>
+                    if (gd.Key != null)
                     {
-                        var _t = treeview_regionNameFixer.Items.OfType<TreeViewItem>().FirstOrDefault(tvi => tvi.Header.ToString() == gd.Key.ToString());
-                        treeview_regionNameFixer.Items.Remove(_t);
-                    };
-
-                    gd.OrderBy(d => d.District).ToList().ForEach(x => innerTVI.Places.Add(x));
-
-                    var _acc = "Cells:";
-                    foreach (var pp in gd)
-                    {
-                        foreach (var ll in pp.Children)
+                        var innerTVI = new TVIDistrictResolver(gd.Key.ToString());
+                        innerTVI.DeleteListViewRequested += (s, e) =>
                         {
-                            _acc += $" {ll.Address}";
+                            var _t = treeview_regionNameFixer.Items.OfType<TreeViewItem>().FirstOrDefault(tvi => tvi.Header.ToString() == gd.Key.ToString());
+                            treeview_regionNameFixer.Items.Remove(_t);
+                        };
+
+                        innerTVI.ListViewItemSelectedCellsRequested += (e, u) =>
+                        {
+                            CellSelectedInRegionColumn = u;
+                        };
+
+                        innerTVI.ResolveRequested += async (s1, e1) =>
+                        {
+                            await ResolveRegionNameForCells(e1.Addresses, e1.ResolvedString);
+                        };
+
+                        gd.OrderBy(d => d.District).ToList().ForEach(x => innerTVI.Places.Add(x));
+
+                        var _acc = "Cells:";
+                        foreach (var pp in gd)
+                        {
+                            foreach (var ll in pp.Children)
+                            {
+                                _acc += $" {ll.Address}";
+                            }
                         }
+
+                        ToolTipService.SetToolTip(innerTVI, _acc);
+
+                        var _tvi = new TreeViewItem { Header = gd.Key, ItemContainerStyle = _childStyle };
+                        _tvi.Items.Add(innerTVI);
+
+                        treeview_regionNameFixer.Items.Add(_tvi);
                     }
 
-                    ToolTipService.SetToolTip(innerTVI, _acc);
-
-                    var _tvi = new TreeViewItem { Header = gd.Key, ItemContainerStyle = _childStyle };
-                    _tvi.Items.Add(innerTVI);
-
-                    treeview_regionNameFixer.Items.Add(_tvi);
                 }
-
-                
-
 
                 IsExportButtonEnabled = true;
             }
@@ -1261,8 +1350,9 @@ namespace Phone_Number_Normalizer
             {
                 MessageBox.Show(ex.Message);
             }
-
         }
+
+        string excelFilePath;
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -1284,6 +1374,95 @@ namespace Phone_Number_Normalizer
         private void expander_mainExcelCleaner_Collapsed(object sender, RoutedEventArgs e)
         {
             expander_mainExcelCleaner.Header = "Show Initials Control elements";
+        }
+
+        async Task ResolveRegionNameForCells(IEnumerable<string> addresses, string value)
+        {
+            try
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using ExcelPackage p = new ExcelPackage(new FileInfo(excelFilePath));
+                
+                foreach (var item in addresses)
+                {
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        p.Workbook.Worksheets[WorksheetIndex].Cells[item].Value = value;
+                    }
+                }
+                await p.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public enum Casing
+        {
+            Lower,
+            Upper,
+            Title
+        }
+        public Casing SelectedCasing { get; set; } = Casing.Title;
+
+        private void rb_casing(object sender, RoutedEventArgs e)
+        {
+            var _rb = sender as RadioButton;
+            switch (_rb.Tag)
+            {
+                case "L": SelectedCasing = Casing.Lower; break;
+                case "U": SelectedCasing = Casing.Upper; break;
+                case "T": SelectedCasing = Casing.Title; break;
+            }
+        }
+
+        private async void btn_changeCase_clicked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using var _pp = new ExcelPackage(new FileInfo(excelFilePath));
+                var _columnLetterPosition = GetColumnName(dataColumn.Position);
+
+                var _address = $"{_columnLetterPosition}:{_columnLetterPosition}";
+
+                var _cellRange = _pp.Workbook.Worksheets[WorksheetIndex].Cells[_address];
+
+                TextInfo info = CultureInfo.CurrentCulture.TextInfo;
+                foreach (var item in _cellRange)
+                {
+                    if (item != null)
+                    {
+                        if (item.Value != null)
+                        {
+                            var _str = item.Value.ToString();
+                            if (!string.IsNullOrEmpty(_str))
+                            {
+                                switch (SelectedCasing)
+                                {
+                                    case Casing.Lower:
+                                        item.Value = _str.ToLower();
+                                        break;
+
+                                    case Casing.Upper:
+                                        item.Value = _str.ToUpper();
+                                        break;
+
+                                    case Casing.Title:
+                                        var _interme = info.ToTitleCase(_str.ToLower());
+                                        item.Value = _interme;
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                }
+                await _pp.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
     }
 }
