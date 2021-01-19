@@ -7,13 +7,13 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="SabellaToolkit"
+    Name="40030HanzalahAdalan.SabellaToolkit"
     Publisher="CN=FD627B2F-9EAF-46D2-8F1D-217754E48DDF"
-    Version="1.2.10.0" />
+    Version="1.2.12.0" />
 
   <Properties>
     <DisplayName>Sabella Toolkit</DisplayName>
-    <PublisherDisplayName>Hanzalah</PublisherDisplayName>
+    <PublisherDisplayName>Hanzalah Adalan</PublisherDisplayName>
     <Logo>Images\StoreLogo.png</Logo>
   </Properties>
 

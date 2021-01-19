@@ -5,8 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Phone_Number_Normalizer.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             d:DesignHeight="450" 
+             d:DesignWidth="800" VirtualizingPanel.IsVirtualizing="True">
+    
+    <Grid VirtualizingPanel.IsVirtualizing="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
@@ -15,7 +17,8 @@
         <ListView x:Name="listview" 
                   ItemsSource="{Binding Places}"
                   SelectionMode="Multiple"
-                  SelectionChanged="ListView_SelectionChanged">
+                  SelectionChanged="ListView_SelectionChanged"
+                  VirtualizingPanel.IsVirtualizing="True">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <TextBlock><Run Text="{Binding District}"/> - <Run Text="{Binding DuplicateCount}" Foreground="Crimson"/> cell(s)</TextBlock>
@@ -25,7 +28,8 @@
 
         <StackPanel Grid.Column="1"
                     Margin="20,0"
-                    VerticalAlignment="Center">
+                    VerticalAlignment="Center"
+                    VirtualizingPanel.IsVirtualizing="True">
 
             <ComboBox x:Name="cmbBox_potentialCandidates" 
                       IsEditable="True"

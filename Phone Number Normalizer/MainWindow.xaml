@@ -219,6 +219,73 @@
         
     <TabControl Style="{StaticResource MaterialDesignTabControl}">
 
+        <TabItem Header="SKU generator">
+            
+            <Grid Margin="20,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="32"></RowDefinition>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <StackPanel Margin="0,10">
+                    <Label x:Name="txtBlock_filename" 
+                               Content="Select an excel file"
+                               d:Content="The selected file.xls"/>
+
+                    <Button x:Name="btn_loadFile" 
+                                Margin="0,8,0,0"
+                                ToolTip="Open an Excel file to process"
+                                Click="btn_loadFile_Click">Load file</Button>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1"
+                                        Margin="10">
+                    <Label>Select sheet</Label>
+                    <ComboBox x:Name="cmbBox_sheetSelector"
+                                          IsEnabled="{Binding IsSheetSelectorEnabled}"
+                                          SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
+                                          DisplayMemberPath="Name">
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2"
+                            Margin="0,10"
+                            Visibility="Collapsed">
+                    <Label>Select column</Label>
+                    <ComboBox x:Name="cmbBox_columnSelector" 
+                          IsEnabled="{Binding IsColumnSelectorEnabled}"
+                          DisplayMemberPath="Name"
+                          SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
+                </StackPanel>
+                
+                
+
+                <Button x:Name="btn_generateSKU"
+                        Grid.Row="2"
+                        VerticalAlignment="Top"
+                        Click="btn_generateSKU_Click"
+                        ToolTip="Finished good SKU"
+                        IsEnabled="{Binding IsGenerateSKUButtonsEnabled}">Generate SKU</Button>
+
+                <Button x:Name="btn_generateWarehouseSKU"
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Margin="8,0"
+                        VerticalAlignment="Top"
+                        Click="btn_generateWarehouseSKU_Click"
+                        ToolTip="Finished good SKU"
+                        IsEnabled="{Binding IsGenerateSKUButtonsEnabled}">Generate Warehouse SKU</Button>
+
+            </Grid>
+        </TabItem>
+        
         <TabItem Header="Excel cleaner">
           
             <Grid>
@@ -231,9 +298,9 @@
 
                 <Expander IsExpanded="True">
                     <Expander.Header>
-                        <Border Background="Black" 
+                        <Border Background="Purple" 
                                 CornerRadius="4"
-                                Padding="8">
+                                Padding="8,2">
                             <TextBlock Foreground="WhiteSmoke" 
                                        Style="{StaticResource MaterialDesignHeadline6TextBlock}">Main controls</TextBlock>
                         </Border>
@@ -249,9 +316,9 @@
                         <Expander x:Name="expander_mainExcelCleaner" 
                           IsExpanded="True">
                             <Expander.Header>
-                                <Border Background="Black" 
+                                <Border Background="Purple" 
                                 CornerRadius="4"
-                                Padding="8">
+                                Padding="8,2">
                                     <TextBlock Foreground="WhiteSmoke" 
                                        Style="{StaticResource MaterialDesignHeadline6TextBlock}">File Loader</TextBlock>
                                 </Border>
@@ -264,45 +331,7 @@
                                     <RowDefinition Height="auto"></RowDefinition>
                                 </Grid.RowDefinitions>
 
-                                <Grid MaxHeight="200"
-                      Margin="20,0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                                        <ColumnDefinition Width="1*"></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Margin="0,10">
-                                        <Label x:Name="txtBlock_filename" 
-                               Content="Select an excel file"
-                               d:Content="The selected file.xls"/>
-
-                                        <Button x:Name="btn_loadFile" 
-                                Margin="0,8,0,0"
-                                ToolTip="Open an Excel file to process"
-                                Click="btn_loadFile_Click">Load file</Button>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="1"
-                                        Margin="10">
-                                        <Label>Select sheet</Label>
-                                        <ComboBox x:Name="cmbBox_sheetSelector"
-                                          IsEnabled="{Binding IsSheetSelectorEnabled}"
-                                          SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
-                                          DisplayMemberPath="Name">
-                                        </ComboBox>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2"
-                        Margin="0,10">
-                                        <Label>Select column</Label>
-                                        <ComboBox x:Name="cmbBox_columnSelector" 
-                          IsEnabled="{Binding IsColumnSelectorEnabled}"
-                          DisplayMemberPath="Name"
-                          SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
-                                    </StackPanel>
-
-                                </Grid>
+                                
 
 
                             </Grid>
@@ -310,9 +339,9 @@
 
                         <Expander Grid.Row="1">
                             <Expander.Header>
-                                <Border Background="Black" 
+                                <Border Background="Purple" 
                                 CornerRadius="4"
-                                Padding="8">
+                                Padding="8,2">
                                     <TextBlock Foreground="WhiteSmoke" 
                                        Style="{StaticResource MaterialDesignHeadline6TextBlock}">Phone number option</TextBlock>
                                 </Border>
@@ -378,9 +407,9 @@
 
                         <Expander Grid.Row="2">
                             <Expander.Header>
-                                <Border Background="Black" 
+                                <Border Background="Purple" 
                                 CornerRadius="4"
-                                Padding="8">
+                                Padding="8,2">
                                     <TextBlock Foreground="WhiteSmoke" 
                                        Style="{StaticResource MaterialDesignHeadline6TextBlock}">District name option</TextBlock>
                                 </Border>
@@ -393,14 +422,19 @@
                                     <ColumnDefinition></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
 
-                                <Button Margin="20,0,0,0"
-                                VerticalAlignment="Top">Load simple</Button>
+                                <StackPanel>
+                                    
+
+                                    <Button Margin="0,20,0,0"
+                                VerticalAlignment="Top"
+                                        Click="Button_Click_3">Load simple</Button>
+                                </StackPanel>
 
                                 <StackPanel Margin="20,0"
                                             Grid.Column="1">
-                                    
+
                                     <CheckBox x:Name="chkBox_excludeGroupWithSingleItem">Exclude groups with single item</CheckBox>
-                                    
+
                                     <Button x:Name="btn_standardizeRegionName" 
                                             Margin="0,10,0,0"
                                             IsEnabled="{Binding IsManipulationButtonsEnabled}"
@@ -453,8 +487,11 @@
                 <ScrollViewer Grid.Row="1"
                               PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                     
-                    <TreeView x:Name="treeview_regionNameFixer"
-                              SelectedItemChanged="treeview_regionNameFixer_SelectedItemChanged">
+                    <TreeView x:Name="treeview_regionNameFixer"                          
+                              SelectedItemChanged="treeview_regionNameFixer_SelectedItemChanged"
+                              VirtualizingStackPanel.IsVirtualizingWhenGrouping="True"
+                              VirtualizingStackPanel.IsVirtualizing="True"
+                              VirtualizingStackPanel.VirtualizationMode="Recycling">
                         <TreeView.ItemContainerStyle>
                             <Style TargetType="{x:Type TreeViewItem}">
                                 <Setter Property="IsExpanded" Value="True" />
@@ -769,7 +806,7 @@
             </Grid>
         </TabItem>
 
-        <TabItem Header="Promo price calculator"></TabItem>
+        <!--<TabItem Header="Promo price calculator"></TabItem>-->
     </TabControl>
     
    

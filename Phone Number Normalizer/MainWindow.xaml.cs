@@ -37,13 +37,16 @@ using Phone_Number_Normalizer.Models;
 using Phone_Number_Normalizer.Controls;
 using System.Globalization;
 using OfficeOpenXml.Style;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using Humanizer;
 
 namespace Phone_Number_Normalizer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : System.Windows.Window
+    public partial class MainWindow : System.Windows.Window, INotifyPropertyChanged
     {
         private LowLevelKeyboardListener _listener;
         public MainWindow()
@@ -261,7 +264,7 @@ namespace Phone_Number_Normalizer
                 excelFilePath = openfileDialog1.FileName;
                 //FileInfo file = new FileInfo(openfileDialog1.FileName);
 
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
 
                 using var _pp = new ExcelPackage(new FileInfo(openfileDialog1.FileName));
 
@@ -303,9 +306,13 @@ namespace Phone_Number_Normalizer
                     }
                     IsColumnSelectorEnabled = true;
                     IsManipulationButtonsEnabled = true;
+
+                    IsGenerateSKUButtonsEnabled = true;
                 }
                 else
                 {
+                    IsGenerateSKUButtonsEnabled = false;
+
                     IsColumnSelectorEnabled = false;
                     IsManipulationButtonsEnabled = false;
                     MessageBox.Show("No table(s) detected in this sheet. please create a table by pressing Ctrl + T to proceed");
@@ -1232,11 +1239,15 @@ namespace Phone_Number_Normalizer
             public object Key { get; set; }
             public IGrouping<object, ExcelRangeBase> Items { get; set; }
         }
+
+
         private void btn_standardizeRegionName_Click(object sender, RoutedEventArgs e)
         {
+            DistrictNames = new ObservableCollection<TreeViewItem>();
+
             SwitchStatusBarItemsVisibility(ExcelManipulationMode.RegionName);
             listbox.ItemsSource = null;
-            treeview_regionNameFixer.Items.Clear();
+
             var _thePlaces = new List<Place>();
 
 
@@ -1256,6 +1267,7 @@ namespace Phone_Number_Normalizer
                                       .Select(y => new CellOBJ { Key = y.Key, Items = y });
 
                 TextInfo info = CultureInfo.CurrentCulture.TextInfo;
+
                 foreach (var _grup in _groupedByValue)
                 {
                     var _disName = info.ToTitleCase(_grup.Key.ToString().Trim());
@@ -1281,10 +1293,8 @@ namespace Phone_Number_Normalizer
                         _parentPlace.GroupKey = _disName.Substring(0, 5);
                     }
 
-
                     foreach (var _it in _grup.Items)
                     {
-
                         var _childPlace = new Place
                         {
                             District = _disName,
@@ -1325,24 +1335,15 @@ namespace Phone_Number_Normalizer
 
                         gd.OrderBy(d => d.District).ToList().ForEach(x => innerTVI.Places.Add(x));
 
-                        var _acc = "Cells:";
-                        foreach (var pp in gd)
-                        {
-                            foreach (var ll in pp.Children)
-                            {
-                                _acc += $" {ll.Address}";
-                            }
-                        }
-
-                        ToolTipService.SetToolTip(innerTVI, _acc);
-
                         var _tvi = new TreeViewItem { Header = gd.Key, ItemContainerStyle = _childStyle };
                         _tvi.Items.Add(innerTVI);
 
-                        treeview_regionNameFixer.Items.Add(_tvi);
+                        DistrictNames.Add(_tvi);
                     }
-
                 }
+
+                treeview_regionNameFixer.ItemsSource = DistrictNames;
+                OnPropertyChanged(nameof(DistrictNames));
 
                 IsExportButtonEnabled = true;
             }
@@ -1352,7 +1353,11 @@ namespace Phone_Number_Normalizer
             }
         }
 
+        public ObservableCollection<TreeViewItem> DistrictNames { get; set; }
+
         string excelFilePath;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -1376,11 +1381,13 @@ namespace Phone_Number_Normalizer
             expander_mainExcelCleaner.Header = "Show Initials Control elements";
         }
 
+        public void OnPropertyChanged(string propName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+
         async Task ResolveRegionNameForCells(IEnumerable<string> addresses, string value)
         {
             try
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
                 using ExcelPackage p = new ExcelPackage(new FileInfo(excelFilePath));
                 
                 foreach (var item in addresses)
@@ -1464,5 +1471,262 @@ namespace Phone_Number_Normalizer
                 MessageBox.Show(ex.Message);
             }
         }
+
+        class Banker
+        {
+            public string Address { get; set; }
+            public string AccountName { get; set; }
+        }
+
+        string GetAccountNameFromHTML(string input)
+        {
+            var _res = Regex.Match(input, @"<br>Account Name: [A-Za-z_0-9_ ]*<br>");
+            var _replaced = _res.Value.Replace("<br>", string.Empty);
+            if (_replaced.Length > 15)
+            {
+                return _replaced.Substring(14);
+            }
+            else
+            {
+                return _replaced;
+            }
+        }
+
+        //void ReplaceAccountName(string input)
+        //{
+        //    Debug.WriteLine(input);
+        //}
+
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            //var _hcHTML = "<br>Bank Transfer/Bank In<br><span style='font - weight:normal'>Bank Name: Cimb bank<br>Account Name: Siti ilmiah binti ismail<br>Account Number: 7039954235</span><br><br>";
+            //var _match = GetAccountNameFromHTML(_hcHTML);
+            //ReplaceAccountName(_match);
+
+            //ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            using var _pp = new ExcelPackage(new FileInfo(excelFilePath));
+            try
+            {
+                var _columnLetterPosition = GetColumnName(dataColumn.Position);
+
+                var _address = $"{_columnLetterPosition}:{_columnLetterPosition}";
+
+                var _cellRange = _pp.Workbook.Worksheets[WorksheetIndex].Cells[_address];
+
+                var _groupedHTMLElements = _cellRange.Where(ii =>
+                {
+                    if (ii.Value != null)
+                    {
+                        return ii.Value.ToString().StartsWith("<br>");
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }).Select(q =>
+                new Banker
+                {
+                    Address = q.Address,
+                    AccountName = GetAccountNameFromHTML(q.Value.ToString())
+                });
+
+
+                try
+                {
+                    foreach (var item in _groupedHTMLElements)
+                    {
+                        if (!string.IsNullOrEmpty(item.Address))
+                        {
+                            _pp.Workbook.Worksheets[WorksheetIndex].Cells[item.Address].Value = item.AccountName;
+                        }
+                    }
+
+                    await _pp.SaveAsync();
+                    MessageBox.Show("SIAP!");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+
+        public bool IsGenerateSKUButtonsEnabled
+        {
+            get { return (bool)GetValue(IsGenerateSKUButtonsEnabledProperty); }
+            set { SetValue(IsGenerateSKUButtonsEnabledProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsGenerateSKUButtonsEnabled.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsGenerateSKUButtonsEnabledProperty =
+            DependencyProperty.Register("IsGenerateSKUButtonsEnabled", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
+
+        /// <summary>
+        /// Generate Finished SKUs
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void btn_generateSKU_Click(object sender, RoutedEventArgs e)
+        {
+            //get sequenced cell address
+            //H:2
+
+            //Adult Freesize = A0
+
+
+
+            // can't use int type since need to support the letter F for freesize as well
+            var _adultSizes = new Dictionary<string, string>()
+            {
+                {"FREESIZE", "F" },
+                {"XS", "1" },
+                {"S", "2" },
+                {"M", "3" },
+                {"L", "4" },
+                {"XL", "5" },
+                {"2XL", "6" },
+                {"3XL", "7" },
+                {"4XL", "8" },
+                {"5XL", "9" },
+            };
+
+            var _kidSizes = new Dictionary<string, int>()
+            {
+                {"2-3Y", 1 },
+                {"4-5Y", 2 },
+                {"6-7Y", 3 },
+                {"8-9Y", 4 },
+                {"10-11Y", 5 }
+            };
+
+            // can't use int type because Range exceed 9 variations
+            var _rangeSizes = new Dictionary<string, string>()
+            {
+                {"1 (XS-S)", "A" },
+                {"1 (XS-M)", "A" },
+                {"1 (XS-XL)", "A" },
+
+                {"2 (M-L)", "B" },
+                {"2 (L-XL)", "B" },
+                {"2 (L-2XL)", "B" },
+                {"2 (2XL-5XL)", "B" },
+
+                {"3 (XL-2XL)", "C" },
+                {"3 (3XL-5XL)", "C" },
+
+                {"4 (3XL-4XL)", "D" },
+
+                {"5 (5XL-6XL)", "E" }
+            };
+
+
+
+
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            using ExcelPackage p = new ExcelPackage(new FileInfo(excelFilePath));
+
+            const string Cookware = "Sabella Premium Cookware Set";
+            try
+            {
+                //need to know available row count before hand
+                for (int i = 2; i < 15000; i++)
+                {
+                    var _fullProdName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"AI{i}"].Value.ToString();
+                    if (_fullProdName == Cookware)
+                    {
+                        continue;
+                    }
+
+                    var _subProdName = _fullProdName.Substring(0,2).Humanize(LetterCasing.AllCaps);
+
+                    System.Diagnostics.Debug.WriteLine(i);
+
+                    var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"AL{i}"].Value.ToString();
+                    
+                    // the last three chars for the size
+                    string _sizeOctet = "";
+                   
+                    string _matchedAdultSize = _adultSizes.FirstOrDefault(x => x.Key == _size).Value;                  
+                    int _matchedKidSize = _kidSizes.FirstOrDefault(x => x.Key == _size).Value;
+                    string _matchedRangeSize = _rangeSizes.FirstOrDefault(x => x.Key == _size).Value;
+
+                    if (!string.IsNullOrEmpty(_matchedAdultSize))// value is not null
+                    {
+                        _sizeOctet = $"{_matchedAdultSize}00";
+                    }
+                    else if (_matchedKidSize != 0)
+                    {
+                        _sizeOctet = $"0{_matchedKidSize}0";
+                    }
+                    else // defaulted to Range Size
+                    {
+                        _sizeOctet = $"00{_matchedRangeSize}";
+                    }
+
+
+                    var _batchPattern = Regex.Match(_fullProdName, @"\d");
+                    var _batchString = !string.IsNullOrEmpty(_batchPattern.Value) ? _batchPattern.Value.PadLeft(2,'0') : "00";
+
+                    //System.Diagnostics.Debug.WriteLine(_batchPattern.Success);
+                    //System.Diagnostics.Debug.WriteLine(_batchPattern.Value);
+
+                    var _color = p.Workbook.Worksheets[WorksheetIndex].Cells[$"AM{i}"].Value.ToString().Substring(0, 2).Humanize(LetterCasing.AllCaps);
+
+                    var _SKU_Address = $"AY{i}";
+                    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = $"{_subProdName}{_batchString}{_color}{_sizeOctet}";
+                }
+                await p.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+
+            //get name > remove abbrev. > get first letters > 
+
+            //get batch
+
+            //get color
+
+            //get size
+        }
+
+        private void btn_generateWarehouseSKU_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        //async Task GenerateSKU_Async(IEnumerable<string> addresses, string value)
+        //{
+        //    try
+        //    {
+        //        ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+        //        using ExcelPackage p = new ExcelPackage(new FileInfo(excelFilePath));
+
+        //        foreach (var item in addresses)
+        //        {
+        //            if (!string.IsNullOrEmpty(item))
+        //            {
+        //                p.Workbook.Worksheets[WorksheetIndex].Cells[item].Value = value;
+        //            }
+        //        }
+        //        await p.SaveAsync();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //}
+
     }
 }
