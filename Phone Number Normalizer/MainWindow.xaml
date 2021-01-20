@@ -220,61 +220,71 @@
     <TabControl Style="{StaticResource MaterialDesignTabControl}">
 
         <TabItem Header="SKU generator">
-            
-            <Grid Margin="20,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="32"></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
+            <DockPanel>
+                
+                <Grid Margin="20,0"
+                      DockPanel.Dock="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Margin="0,10">
-                    <Label x:Name="txtBlock_filename" 
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition Height="14"></RowDefinition>
+                        <RowDefinition Height="auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Label x:Name="LabelIterator" 
+                           d:Content="172"
+                           Grid.Column="2"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="42"
+                           FontWeight="Bold"></Label>
+                    
+                    <StackPanel Margin="0,10">
+                        <Label x:Name="txtBlock_filename" 
                                Content="Select an excel file"
                                d:Content="The selected file.xls"/>
 
-                    <Button x:Name="btn_loadFile" 
+                        <Button x:Name="btn_loadFile" 
                                 Margin="0,8,0,0"
                                 ToolTip="Open an Excel file to process"
                                 Click="btn_loadFile_Click">Load file</Button>
-                </StackPanel>
+                    </StackPanel>
 
-                <StackPanel Grid.Column="1"
+                    <StackPanel Grid.Column="1"
                                         Margin="10">
-                    <Label>Select sheet</Label>
-                    <ComboBox x:Name="cmbBox_sheetSelector"
+                        <Label>Select sheet</Label>
+                        <ComboBox x:Name="cmbBox_sheetSelector"
                                           IsEnabled="{Binding IsSheetSelectorEnabled}"
                                           SelectionChanged="cmbBox_sheetSelector_SelectionChanged"
                                           DisplayMemberPath="Name">
-                    </ComboBox>
-                </StackPanel>
+                        </ComboBox>
+                    </StackPanel>
 
-                <StackPanel Grid.Column="2"
+                    <StackPanel Grid.Column="2"
                             Margin="0,10"
                             Visibility="Collapsed">
-                    <Label>Select column</Label>
-                    <ComboBox x:Name="cmbBox_columnSelector" 
+                        <Label>Select column</Label>
+                        <ComboBox x:Name="cmbBox_columnSelector" 
                           IsEnabled="{Binding IsColumnSelectorEnabled}"
                           DisplayMemberPath="Name"
                           SelectionChanged="cmbBox_columnSelector_SelectionChanged"/>
-                </StackPanel>
-                
-                
+                    </StackPanel>
 
-                <Button x:Name="btn_generateSKU"
+                    <Button x:Name="btn_generateSKU"
                         Grid.Row="2"
                         VerticalAlignment="Top"
                         Click="btn_generateSKU_Click"
                         ToolTip="Finished good SKU"
                         IsEnabled="{Binding IsGenerateSKUButtonsEnabled}">Generate SKU</Button>
 
-                <Button x:Name="btn_generateWarehouseSKU"
+                    <Button x:Name="btn_generateWarehouseSKU"
                         Grid.Row="2"
                         Grid.Column="1"
                         Margin="8,0"
@@ -283,7 +293,22 @@
                         ToolTip="Finished good SKU"
                         IsEnabled="{Binding IsGenerateSKUButtonsEnabled}">Generate Warehouse SKU</Button>
 
-            </Grid>
+                    <Button x:Name="btn_openExcelFile" 
+                            IsEnabled="{Binding IsOpenExcelFileButtonEnabled}"
+                            Grid.Column="2"
+                            Grid.Row="2"
+                            Click="btn_openExcelFile_Click">Open excel file</Button>
+
+                </Grid>
+
+                <ScrollViewer DockPanel.Dock="Bottom">
+                    <TextBlock x:Name="txtBlockStatus"
+                           Margin="20"
+                           TextWrapping="Wrap"
+                           d:Text="This the status"/>
+                </ScrollViewer>
+            </DockPanel>
+
         </TabItem>
         
         <TabItem Header="Excel cleaner">

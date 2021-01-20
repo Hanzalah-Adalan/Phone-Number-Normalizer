@@ -254,6 +254,12 @@ namespace Phone_Number_Normalizer
 
         private async void btn_loadFile_Click(object sender, RoutedEventArgs e)
         {
+            IsOpenExcelFileButtonEnabled = false;
+            IsGenerateSKUButtonsEnabled = false;
+
+            txtBlockStatus.Text = string.Empty;
+            LabelIterator.Content = string.Empty;
+
             OpenFileDialog openfileDialog1 = new OpenFileDialog
             {
                 Filter = "Excel Files|*.xls;*.xlsx;*.xlsm"
@@ -1569,6 +1575,10 @@ namespace Phone_Number_Normalizer
 
 
 
+        const string Cookware = "Sabella Premium Cookware Set";
+        int? _itemCount = null;
+
+
         /// <summary>
         /// Generate Finished SKUs
         /// </summary>
@@ -1576,12 +1586,7 @@ namespace Phone_Number_Normalizer
         /// <param name="e"></param>
         private async void btn_generateSKU_Click(object sender, RoutedEventArgs e)
         {
-            //get sequenced cell address
-            //H:2
-
-            //Adult Freesize = A0
-
-
+            IsOpenExcelFileButtonEnabled = false;
 
             // can't use int type since need to support the letter F for freesize as well
             var _adultSizes = new Dictionary<string, string>()
@@ -1635,13 +1640,62 @@ namespace Phone_Number_Normalizer
             ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
             using ExcelPackage p = new ExcelPackage(new FileInfo(excelFilePath));
 
-            const string Cookware = "Sabella Premium Cookware Set";
             try
-            {
+            {               
+                var _s = p.Workbook.Worksheets[WorksheetIndex].Dimension.Start.Row;
+                var _e = p.Workbook.Worksheets[WorksheetIndex].Dimension.End.Row;
+                var _allRowsCount = _e - _s;
+
                 //need to know available row count before hand
-                for (int i = 2; i < 590; i++)
+                for (int i = 2; i < _allRowsCount+2; i++)
                 {
-                    var _fullProdName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"A{i}"].Value.ToString();
+                    System.Diagnostics.Debug.WriteLine(i);
+                    _itemCount = i;
+                    LabelIterator.Content = i.ToString();
+
+                    //var _ress = await Task.Run(() =>
+                    //{
+                    //    var _prodName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"A{i}"].Value;
+                    //    var _color = p.Workbook.Worksheets[WorksheetIndex].Cells[$"D{i}"].Value;
+                    //    var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"B{i}"].Value;
+
+                    //    return (_prodName, _color, _size);
+                    //});
+
+                    Tuple<object, object, object> Gen()
+                    {
+                        var _prodName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"A{i}"].Value;
+                        var _color = p.Workbook.Worksheets[WorksheetIndex].Cells[$"D{i}"].Value;
+                        var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"B{i}"].Value;
+
+                        return new Tuple<object, object, object>(_prodName, _color, _size);
+                    }
+
+                    var _ress = Gen();
+
+                    if (_ress.Item1 == null)
+                    {
+                        MessageBox.Show($"Product Design is null at row {i}");
+                        continue;
+                    }
+                    else if (_ress.Item2 == null)
+                    {
+                        MessageBox.Show($"Color is null at row {i}");
+                        continue;
+                    }
+                    else if (_ress.Item3 == null)
+                    {
+                        MessageBox.Show($"Size is null at row {i}");
+                        continue;
+                    }
+
+                    var _prodName = _ress.Item1;
+                    var _color = _ress.Item2;
+                    var _size = _ress.Item3.ToString();
+
+                    var _fullProdName = _prodName.ToString();
+                    //var _fullProdName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"A{i}"].Value.ToString();
+
                     if (_fullProdName == Cookware)
                     {
                         continue;
@@ -1695,10 +1749,7 @@ namespace Phone_Number_Normalizer
                         }
                     }
 
-
-                    System.Diagnostics.Debug.WriteLine(i);
-
-                    var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"B{i}"].Value.ToString();
+                    //var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"B{i}"].Value.ToString();
                     
                     // the last three chars for the size
                     string _sizeOctet = "";
@@ -1724,7 +1775,10 @@ namespace Phone_Number_Normalizer
                     var _batchPattern = Regex.Match(_fullProdName, @"\d+");
                     var _batchString = !string.IsNullOrEmpty(_batchPattern.Value) ? _batchPattern.Value.PadLeft(2,'0') : "00";
 
-                    var _fullColorName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"D{i}"].Value.ToString();
+                    
+
+                    var _fullColorName = _color.ToString();
+                    //var _fullColorName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"D{i}"].Value.ToString();
 
                     var _reg = new Regex(@"\b(\w+\s*)+");
                     var _result = _reg.Match(_fullColorName);
@@ -1761,12 +1815,33 @@ namespace Phone_Number_Normalizer
                     }
 
                     var _SKU_Address = $"H{i}";
-                    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = $"{_composedProdNameAcronym}{_batchString}{_composedColorAcronym}{_sizeOctet}";
+                    var _generatedSKU = $"{_composedProdNameAcronym}{_batchString}{_composedColorAcronym}{_sizeOctet}";
+
+                    //await Task.Run(() =>
+                    //{
+                    //    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = _generatedSKU;
+                    //});
+
+                    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = _generatedSKU;
+
+                    txtBlockStatus.Text += $"Design: {_fullProdName} Batch: {_batchString} Color: {_fullColorName} Size: {_size} ====> SKU: {_generatedSKU}{Environment.NewLine}";
                 }
 
                 await p.SaveAsync();
 
-                MessageBox.Show("Alhamdulillah. done!");
+                MessageBox.Show($"Alhamdulillah. Done generate {_itemCount} SKU(s)");
+                IsOpenExcelFileButtonEnabled = true;
+            }
+            catch (IOException io)
+            {
+                if (io.Message.Contains("because it is being used by another process"))
+                {
+                    MessageBox.Show("Sila tutup excel yg berkenaan tu dulu sebelum proceed");
+                }
+                else
+                {
+                    MessageBox.Show(io.Message);
+                }
             }
             catch (InvalidOperationException ioe)
             {
@@ -1783,21 +1858,36 @@ namespace Phone_Number_Normalizer
             {
                 MessageBox.Show(ex.Message);
             }
-
-
-
-            //get name > remove abbrev. > get first letters > 
-
-            //get batch
-
-            //get color
-
-            //get size
         }
 
         private void btn_generateWarehouseSKU_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+
+
+        public bool IsOpenExcelFileButtonEnabled
+        {
+            get { return (bool)GetValue(IsOpenExcelFileButtonEnabledProperty); }
+            set { SetValue(IsOpenExcelFileButtonEnabledProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for IsOpenExcelFileButtonEnabled.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty IsOpenExcelFileButtonEnabledProperty =
+            DependencyProperty.Register("IsOpenExcelFileButtonEnabled", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
+        private void btn_openExcelFile_Click(object sender, RoutedEventArgs e)
+        {
+            var p = new Process
+            {
+                StartInfo = new ProcessStartInfo(excelFilePath)
+                {
+                    UseShellExecute = true
+                }
+            };
+            p.Start();
         }
 
         //async Task GenerateSKU_Async(IEnumerable<string> addresses, string value)
