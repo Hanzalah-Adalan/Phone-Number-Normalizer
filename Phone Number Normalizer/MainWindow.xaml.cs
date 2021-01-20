@@ -1587,6 +1587,8 @@ namespace Phone_Number_Normalizer
             var _adultSizes = new Dictionary<string, string>()
             {
                 {"FREESIZE", "F" },
+                {"Free Size", "F" },
+
                 {"XS", "1" },
                 {"S", "2" },
                 {"M", "3" },
@@ -1608,23 +1610,23 @@ namespace Phone_Number_Normalizer
             };
 
             // can't use int type because Range exceed 9 variations
-            var _rangeSizes = new Dictionary<string, string>()
+            var _rangeSizes = new Dictionary<string, int>()
             {
-                {"1 (XS-S)", "A" },
-                {"1 (XS-M)", "A" },
-                {"1 (XS-XL)", "A" },
+                {"1 (XS-S)", 1 },
+                {"1 (XS-M)", 1 },
+                {"1 (XS-XL)", 1 },
 
-                {"2 (M-L)", "B" },
-                {"2 (L-XL)", "B" },
-                {"2 (L-2XL)", "B" },
-                {"2 (2XL-5XL)", "B" },
+                {"2 (M-L)", 2 },
+                {"2 (L-XL)", 2 },
+                {"2 (L-2XL)", 2 },
+                {"2 (2XL-5XL)", 2 },
 
-                {"3 (XL-2XL)", "C" },
-                {"3 (3XL-5XL)", "C" },
+                {"3 (XL-2XL)", 3 },
+                {"3 (3XL-5XL)", 3 },
 
-                {"4 (3XL-4XL)", "D" },
+                {"4 (3XL-4XL)", 4 },
 
-                {"5 (5XL-6XL)", "E" }
+                {"5 (5XL-6XL)", 5 }
             };
 
 
@@ -1637,26 +1639,73 @@ namespace Phone_Number_Normalizer
             try
             {
                 //need to know available row count before hand
-                for (int i = 2; i < 15000; i++)
+                for (int i = 2; i < 590; i++)
                 {
-                    var _fullProdName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"AI{i}"].Value.ToString();
+                    var _fullProdName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"A{i}"].Value.ToString();
                     if (_fullProdName == Cookware)
                     {
                         continue;
                     }
 
-                    var _subProdName = _fullProdName.Substring(0,2).Humanize(LetterCasing.AllCaps);
+                    var _patternFullName = new Regex(@"\b([a-zA-Z]+\s*)+");
+                    var _resultFN = _patternFullName.Match(Regex.Replace(_fullProdName, @"[\d.]", string.Empty));
+
+                    var _holdListFN = new List<string>();
+                    if (_resultFN.Success)
+                    {
+                        for (int _groupIterator = 1; _groupIterator < _resultFN.Groups.Count; _groupIterator++)
+                        {
+                            foreach (Capture capture in _resultFN.Groups[_groupIterator].Captures)
+                            {
+                                _holdListFN.Add(capture.Value);
+                            }
+                        }
+                    }
+
+                    var _composedProdNameAcronym = "";
+
+                    if (_holdListFN.Count == 1)
+                    {
+                        _composedProdNameAcronym = _holdListFN.First().Substring(0, 4).Humanize(LetterCasing.AllCaps);
+                    }
+                    else if (_holdListFN.Count == 2)
+                    {
+                        _composedProdNameAcronym = _holdListFN.First().Substring(0, 2).Humanize(LetterCasing.AllCaps)
+                            + _holdListFN.Last().Substring(0, 2).Humanize(LetterCasing.AllCaps);
+                    }
+                    else if (_holdListFN.Count == 3)
+                    {
+                        for (int idx = 0; idx < 3; idx++)
+                        {
+                            if (idx == 2)
+                            {
+                                _composedProdNameAcronym += _holdListFN[idx].Substring(0, 2).Humanize(LetterCasing.AllCaps);
+                            }
+                            else
+                            {
+                                _composedProdNameAcronym += _holdListFN[idx].Substring(0, 1).Humanize(LetterCasing.AllCaps);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int iq = 0; iq < 4; iq++)
+                        {
+                            _composedProdNameAcronym += _holdListFN[iq].Substring(0, 1).Humanize(LetterCasing.AllCaps);
+                        }
+                    }
+
 
                     System.Diagnostics.Debug.WriteLine(i);
 
-                    var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"AL{i}"].Value.ToString();
+                    var _size = p.Workbook.Worksheets[WorksheetIndex].Cells[$"B{i}"].Value.ToString();
                     
                     // the last three chars for the size
                     string _sizeOctet = "";
                    
                     string _matchedAdultSize = _adultSizes.FirstOrDefault(x => x.Key == _size).Value;                  
                     int _matchedKidSize = _kidSizes.FirstOrDefault(x => x.Key == _size).Value;
-                    string _matchedRangeSize = _rangeSizes.FirstOrDefault(x => x.Key == _size).Value;
+                    int _matchedRangeSize = _rangeSizes.FirstOrDefault(x => x.Key == _size).Value;
 
                     if (!string.IsNullOrEmpty(_matchedAdultSize))// value is not null
                     {
@@ -1672,18 +1721,63 @@ namespace Phone_Number_Normalizer
                     }
 
 
-                    var _batchPattern = Regex.Match(_fullProdName, @"\d");
+                    var _batchPattern = Regex.Match(_fullProdName, @"\d+");
                     var _batchString = !string.IsNullOrEmpty(_batchPattern.Value) ? _batchPattern.Value.PadLeft(2,'0') : "00";
 
-                    //System.Diagnostics.Debug.WriteLine(_batchPattern.Success);
-                    //System.Diagnostics.Debug.WriteLine(_batchPattern.Value);
+                    var _fullColorName = p.Workbook.Worksheets[WorksheetIndex].Cells[$"D{i}"].Value.ToString();
 
-                    var _color = p.Workbook.Worksheets[WorksheetIndex].Cells[$"AM{i}"].Value.ToString().Substring(0, 2).Humanize(LetterCasing.AllCaps);
+                    var _reg = new Regex(@"\b(\w+\s*)+");
+                    var _result = _reg.Match(_fullColorName);
 
-                    var _SKU_Address = $"AY{i}";
-                    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = $"{_subProdName}{_batchString}{_color}{_sizeOctet}";
+                    var _holdList = new List<string>();
+                    if (_result.Success)
+                    {
+                        for (int _groupIterator = 1; _groupIterator < _result.Groups.Count; _groupIterator++)
+                        {
+                            foreach (Capture capture in _result.Groups[_groupIterator].Captures)
+                            {
+                                _holdList.Add(capture.Value);
+                            }
+                        }
+                    }
+
+                    var _composedColorAcronym = "";
+
+                    if (_holdList.Count == 1)
+                    {
+                        _composedColorAcronym = _holdList.First().Substring(0, 3).Humanize(LetterCasing.AllCaps);
+                    }
+                    else if (_holdList.Count == 2)
+                    {
+                        _composedColorAcronym = _holdList.First().Substring(0, 2).Humanize(LetterCasing.AllCaps)
+                            + _holdList.Last().Substring(0, 1).Humanize(LetterCasing.AllCaps);
+                    }
+                    else if (_holdList.Count == 3)
+                    {
+                        foreach (var item in _holdList)
+                        {
+                            _composedColorAcronym += item.Substring(0, 1).Humanize(LetterCasing.AllCaps);
+                        }
+                    }
+
+                    var _SKU_Address = $"H{i}";
+                    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = $"{_composedProdNameAcronym}{_batchString}{_composedColorAcronym}{_sizeOctet}";
                 }
+
                 await p.SaveAsync();
+
+                MessageBox.Show("Alhamdulillah. done!");
+            }
+            catch (InvalidOperationException ioe)
+            {
+                if (ioe.Message.Contains("Error saving file"))
+                {
+                    MessageBox.Show("Sila close file excel dulu sebelum click 'Generate SKU'. Pastu cuba lagi skali ^_^");
+                }
+                else
+                {
+                    MessageBox.Show(ioe.Message);
+                }              
             }
             catch (Exception ex)
             {
