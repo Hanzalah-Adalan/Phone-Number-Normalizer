@@ -1860,9 +1860,112 @@ namespace Phone_Number_Normalizer
             }
         }
 
-        private void btn_generateWarehouseSKU_Click(object sender, RoutedEventArgs e)
+        private async void btn_generateWarehouseSKU_Click(object sender, RoutedEventArgs e)
         {
+            IsOpenExcelFileButtonEnabled = false;
 
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+            using ExcelPackage p = new ExcelPackage(new FileInfo(excelFilePath));
+
+            try
+            {
+                var _s = p.Workbook.Worksheets[WorksheetIndex].Dimension.Start.Row;
+                var _e = p.Workbook.Worksheets[WorksheetIndex].Dimension.End.Row;
+                var _allRowsCount = _e - _s;
+
+                //need to know available row count before hand
+                for (int i = 2; i < _allRowsCount + 2; i++)
+                {
+                    System.Diagnostics.Debug.WriteLine(i);
+                    _itemCount = i;
+                    LabelIterator.Content = i.ToString();
+
+                    Tuple<object, object, object> Gen()
+                    {
+                        var _supplier = p.Workbook.Worksheets[WorksheetIndex].Cells[$"A{i}"].Value;
+                        var _color = p.Workbook.Worksheets[WorksheetIndex].Cells[$"C{i}"].Value;
+                        var _yard = p.Workbook.Worksheets[WorksheetIndex].Cells[$"F{i}"].Value;
+
+                        return new Tuple<object, object, object>(_supplier, _color, _yard);
+                    }
+
+                    var _ress = Gen();
+
+                    if (_ress.Item1 == null)
+                    {
+                        MessageBox.Show($"Supplier is null at row {i}");
+                        continue;
+                    }
+                    else if (_ress.Item2 == null)
+                    {
+                        MessageBox.Show($"Color is null at row {i}");
+                        continue;
+                    }
+                    else if (_ress.Item3 == null)
+                    {
+                        MessageBox.Show($"Yard is null at row {i}");
+                        continue;
+                    }
+
+                    var _pSupplier = _ress.Item1;
+                    var _pColor = Regex.Replace(_ress.Item2.ToString(), @"[- ]", string.Empty);
+                    var _pYard = _ress.Item3.ToString();
+
+                    var _fullProdName = _pSupplier.ToString();
+
+                    if (_fullProdName == Cookware)
+                    {
+                        continue;
+                    }
+
+                    var _supplierDICT = new Dictionary<string, string>()
+                    {
+                        {"MEGA", "MG" },
+                        {"SWAT", "SW" },
+                    };
+
+                    var _supplierInitia = _supplierDICT.FirstOrDefault(sc => sc.Key == _fullProdName);
+                    
+
+                    var _SKU_Address = $"G{i}";
+                    var _generatedSKU = $"{_supplierInitia.Value}{_pColor.PadLeft(7,'0')}{_pYard.PadLeft(3, '0')}";
+
+                    p.Workbook.Worksheets[WorksheetIndex].Cells[_SKU_Address].Value = _generatedSKU;
+
+                    txtBlockStatus.Text += $"Design: {_fullProdName} Color: {_pColor} Yard: {_pYard} ====> SKU: {_generatedSKU}{Environment.NewLine}";
+                }
+
+                await p.SaveAsync();
+
+                MessageBox.Show($"Alhamdulillah. Done generate {_itemCount} SKU(s)");
+                IsOpenExcelFileButtonEnabled = true;
+            }
+            catch (IOException io)
+            {
+                if (io.Message.Contains("because it is being used by another process"))
+                {
+                    MessageBox.Show("Sila tutup excel yg berkenaan tu dulu sebelum proceed");
+                }
+                else
+                {
+                    MessageBox.Show(io.Message);
+                }
+            }
+            catch (InvalidOperationException ioe)
+            {
+                if (ioe.Message.Contains("Error saving file"))
+                {
+                    MessageBox.Show("Sila close file excel dulu sebelum click 'Generate SKU'. Pastu cuba lagi skali ^_^");
+                }
+                else
+                {
+                    MessageBox.Show(ioe.Message);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
 
